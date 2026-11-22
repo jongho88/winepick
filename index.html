@@ -625,8 +625,8 @@ function renderHome(){
   const last=store.get('lastResult',null);
   const recs=store.get('records',[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   const first=!recs.length&&!last;
-  let h=`<h1 class="thin">오늘은 어떤 병을 꺼낼까요?</h1>
-  <p class="cellar-sub">선반의 병을 눌러 보세요.</p>
+  let h=`<h1 class="thin">오늘은 어떤 와인을 꺼낼까요?</h1>
+  <p class="cellar-sub">선반의 와인병을 눌러 보세요.</p>
   <div class="shelf">
     <button class="bt ${first?'hint':''}" data-go="learn" aria-label="와인 기초 배우기">${bottle('#B30737','기초')}</button>
     <button class="bt" data-go="pick" aria-label="취향 찾고 추천받기">${bottle('#C9B45A','추천')}</button>
@@ -654,7 +654,7 @@ function renderHome(){
 }
 
 function renderLearn(){
-  view.innerHTML=`<h1 style="font-size:23px">와인 기초</h1>
+  view.innerHTML=`<h1 class="thin">와인 기초</h1>
   <div class="ljump">${LEARN.map((c,i)=>`<button data-j="${i}">${i+1}. ${esc(c.k.replace(/^\d+\.\s*/,'').split(' · ')[0])}</button>`).join('')}</div>
   ${LEARN.map((c,i)=>`<div class="lcard" id="lc${i}">
     <div class="lart">${c.art()}</div>
@@ -670,7 +670,7 @@ function renderPick(){
   if(S.quiz) return renderQuiz();
   const last=store.get('lastResult',null);
   if(last) return renderResult(last);
-  view.innerHTML=`<h1>내 취향 찾기</h1>
+  view.innerHTML=`<h1 class="thin">내 취향 찾기</h1>
   <p class="muted">와인 용어를 몰라도 괜찮아요. 평소 입맛만 알려 주세요.</p>
   <div class="card">
     <div style="display:flex;gap:10px;justify-content:center;margin:6px 0 14px">${['red','white','rose','sparkling'].map(t=>glass(t,34)).join('')}</div>
@@ -686,7 +686,7 @@ function renderQuiz(){
   view.innerHTML=`<button class="back" id="qBack"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg>${st===0?'그만하기':'이전 질문'}</button>
   <div class="progress"><i style="width:${(st+1)/QUIZ.length*100}%"></i></div>
   <div class="muted small">${st+1} / ${QUIZ.length}</div>
-  <h1 style="font-size:24px">${Q.q}</h1>
+  <h1 class="thin" style="font-size:24px;margin-top:10px">${Q.q}</h1>
   ${Q.hint?`<p class="muted small">${Q.hint}</p>`:''}
   <div>${opts.map(([v,l,sub])=>`<button class="opt ${cur===v?'on':''}" data-v="${v}"><span class="o"></span><span>${esc(l)}${sub?`<small>${esc(sub)}</small>`:''}</span></button>`).join('')}</div>`;
   $('#qBack').onclick=()=>{if(st===0){S.quiz=null;}else S.quiz.step--;render();};
@@ -707,7 +707,7 @@ function renderResult(res){
     ${tasteBlock(T)}
     <p class="small muted" style="margin:12px 0 0">${res.ans.food?esc(FOOD[res.ans.food]):''}${res.ans.occ?' · '+esc(OCC[res.ans.occ]):''}${+res.ans.budget?' · '+esc(PRICE[settings.currency][res.ans.budget]):''}</p>
   </div>
-  <h2>추천 와인 ${res.items.length}개</h2>
+  <h1 class="thin" style="margin-top:24px">추천 와인 ${res.items.length}개</h1>
   ${res.items.map((it,i)=>wineCard(WMAP[it.id],it.why,i)).join('')}
   <div class="tip">🛒 와인 가게에서는 추천 이름을 보여 주면서 "이런 스타일로 추천해 주세요"라고 물어보세요. 예시 제품은 가게마다 없을 수도 있어요.</div>
   <div class="row" style="margin-top:8px"><button class="btn ghost" id="redo">다시 하기</button><button class="btn" data-go="log">기록하러 가기</button></div>`;
@@ -737,7 +737,7 @@ function recCard(r){
 function fmtDate(d){if(!d)return'';const p=d.split('-');return p.length===3?`${+p[1]}월 ${+p[2]}일`:d;}
 function renderLog(){
   const recs=store.get('records',[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  let h=`<div class="sec-title"><h1 style="font-size:24px">내 와인 기록</h1><button class="btn" id="addRec" style="min-height:42px;padding:10px 14px">+ 기록</button></div>`;
+  let h=`<div class="sec-title"><h1 class="thin" style="margin:0">내 와인 기록</h1><button class="btn" id="addRec" style="min-height:42px;padding:10px 14px">+ 기록</button></div>`;
   if(!recs.length){
     h+=`<div class="card empty">${glass('red',60)}<p style="margin-top:10px"><b>아직 기록이 없어요</b></p><p class="small">마셔 본 와인을 별점과 함께 남겨 보세요.<br>좋았던 스타일은 다음 추천에 더 많이 나와요.</p><button class="btn block" id="addRec2">첫 와인 기록하기</button></div>`;
   }else{
@@ -814,7 +814,7 @@ function openRecord(id,styleId){
 
 function openSettings(){if(S.tab!=='settings'){S.prev=S.tab;}S.tab='settings';render();}
 function renderSettings(){
-  view.innerHTML=`<button class="back" id="sBack"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg>돌아가기</button><h1 style="font-size:24px;margin-top:6px">설정</h1><div class="card">
+  view.innerHTML=`<button class="back" id="sBack"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg>돌아가기</button><h1 class="thin" style="margin-top:6px">설정</h1><div class="card">
   <div class="field" style="margin-top:0"><label>가격 단위</label><div class="seg" id="cur"><button type="button" data-c="KRW" class="${settings.currency==='KRW'?'on':''}">원 (₩)</button><button type="button" data-c="USD" class="${settings.currency==='USD'?'on':''}">달러 ($)</button></div></div></div>
   <div class="card" style="margin:16px 0"><h3>친구에게 알려 주기</h3><p class="small muted">이 앱 주소를 복사해서 카톡이나 문자로 보내세요. 친구 기록은 친구 폰에만 저장돼요.</p><button class="btn soft block" id="share">주소 복사하기</button></div>
   <div class="card" style="margin:16px 0"><h3>백업</h3><p class="small muted">기록은 이 폰의 이 브라우저에만 저장돼요. 브라우저 데이터를 지우면 사라지니 가끔 백업해 두세요.</p>
