@@ -343,6 +343,9 @@ main .stats + .medals .medal{color:#FBE3EA}
 .lineart text.e{font-size:10px;fill:#C9A7AE;font-style:italic}
 .lineart text.s{font-size:10.5px;fill:#D9C3C8}
 .lineart text.ac{fill:#E0315F}.lineart text.go{fill:#D9B56A}
+.brand{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:transform .5s ease}
+.brand.pressing{transform:scale(.92)}
+.sister{font-size:12px;color:#9C7C84;text-decoration:none;letter-spacing:.04em;opacity:.8}
 </style>
 </head>
 <body>
@@ -1445,7 +1448,7 @@ function renderSettings(){
   </div>
   <div class="card"><h3>홈 화면에 추가하기</h3><p class="small muted" style="margin:0">아이콘이 생겨서 앱처럼 바로 열 수 있어요.<br>· 아이폰: 사파리 아래 공유 버튼 → <b>홈 화면에 추가</b><br>· 안드로이드: 크롬 오른쪽 위 ⋮ → <b>홈 화면에 추가</b></p></div>
   <button class="btn danger block" id="wipe" style="margin-top:6px">모든 기록 지우기</button>
-  <p class="foot">WinePick</p>`;
+  <p class="foot" style="margin-bottom:4px">WinePick</p><p style="text-align:center;margin:0 0 10px"><a class="sister" href="${COCKTAILPICK_URL}" target="_blank" rel="noopener">🍸 CocktailPick ↗</a></p>`;
   const s=view;const back=()=>go(S.prev&&S.prev!=='settings'?S.prev:'home');
   s.querySelector('#sBack').onclick=back;
   {
@@ -1486,6 +1489,36 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b
 $('#settingsBtn').onclick=openSettings;
 S.level=store.get('level','basic')||'basic';
 function fromHash(){const h=(location.hash||'').slice(1);if(['home','learn','pick','log'].includes(h)){S.tab=h;}}
+/* ---------- CocktailPick 연결 ---------- */
+const COCKTAILPICK_URL='https://claude.ai/artifact/NQuTpAUpEdxKHQf8SZfh3F'; // GitHub에 올리면 https://jongho88.github.io/cocktailpick/ 로 바꾸세요
+function cocktailSVG(w){return `<svg width="${w}" height="${w*1.2}" viewBox="0 0 80 96" aria-hidden="true"><defs><linearGradient id="ckg" x1="0" x2="1"><stop offset="0" stop-color="#5E8F22"/><stop offset=".45" stop-color="#A8D86A"/><stop offset="1" stop-color="#5E8F22"/></linearGradient></defs>
+<path d="M8 14H72L40 52Z" fill="rgba(255,255,255,.12)" stroke="#F3E6DA" stroke-width="1.6" stroke-linejoin="round"/><path d="M14.5 20H65.5L40 50Z" fill="url(#ckg)"/><path d="M20 22L30 22L40 46" stroke="#fff" stroke-opacity=".45" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M40 52V86M26 89H54" stroke="#F3E6DA" stroke-width="2.2" stroke-linecap="round"/>
+<circle cx="66" cy="14" r="9" fill="#C8E68A" stroke="#7FB03A" stroke-width="1.5"/><path d="M66 6V22M58 14H74M60 8L72 20M72 8L60 20" stroke="#7FB03A" stroke-width=".8"/>
+<path d="M30 6C34 0 42 0 44 4" stroke="#6E8B4E" stroke-width="1.6" fill="none"/><ellipse cx="45" cy="7" rx="5" ry="3" fill="#4E7A2E" transform="rotate(25 45 7)"/></svg>`;}
+function showCocktailInvite(){
+  const o=document.createElement('div');o.className='celebrate';
+  o.innerHTML=`<div class="cel-card"><div class="cel-medal" style="margin-top:-74px">${cocktailSVG(78)}</div>
+  <div class="cel-k" style="color:#6E9E2E">CocktailPick</div><div class="cel-n" style="font-size:22px;margin-top:6px">칵테일도 좋아하세요?</div>
+  <p class="small" style="color:#7A6567;margin:10px 0 16px">와인처럼 배우고, 취향대로 추천받고,<br>집에 있는 재료로 만들 수 있는 칵테일도 찾아 줘요.</p>
+  <a class="btn block" id="ckGo" href="${COCKTAILPICK_URL}" target="_blank" rel="noopener" style="text-decoration:none;background:#6E9E2E">좋아요! CocktailPick 열기</a>
+  <button class="btn ghost block" id="ckNo" style="margin-top:10px">오늘은 와인만</button></div>`;
+  const close=()=>o.remove();
+  o.onclick=e=>{if(e.target===o)close();};
+  o.querySelector('#ckGo').onclick=()=>setTimeout(close,300);
+  o.querySelector('#ckNo').onclick=()=>{close();toast('와인도 좋은 선택이에요 🍷');};
+  document.body.appendChild(o);try{navigator.vibrate&&navigator.vibrate(25);}catch(e){}
+}
+(function bindBrandPress(){
+  const br=document.querySelector('.brand');if(!br)return;
+  let t=null,fired=false,sx=0,sy=0;
+  const cancel=()=>{clearTimeout(t);t=null;br.classList.remove('pressing');};
+  br.addEventListener('pointerdown',e=>{fired=false;sx=e.clientX;sy=e.clientY;br.classList.add('pressing');t=setTimeout(()=>{t=null;fired=true;br.classList.remove('pressing');showCocktailInvite();},650);});
+  br.addEventListener('pointermove',e=>{if(t&&(Math.abs(e.clientX-sx)>10||Math.abs(e.clientY-sy)>10))cancel();});
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>br.addEventListener(ev,cancel));
+  br.addEventListener('contextmenu',e=>e.preventDefault());
+  br.addEventListener('click',e=>{if(fired){e.preventDefault();e.stopImmediatePropagation();fired=false;}},true);
+})();
 /* 시작 화면 */
 (function splash(){
   const sp=$('#splash');if(!sp)return;
