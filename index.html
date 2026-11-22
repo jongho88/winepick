@@ -6,6 +6,16 @@
 <title>WinePick</title>
 <meta name="theme-color" content="#22070E">
 <meta name="description" content="와인 초보를 위한 기초 설명, 취향 추천, 마셔 본 와인 기록">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="WinePick">
+<meta property="og:title" content="WinePick · 와인, 어렵지 않아요">
+<meta property="og:description" content="와인 기초를 배우고, 내 입맛에 맞는 와인을 추천받고, 마셔 본 와인을 기록해요.">
+<meta property="og:image" content="https://jongho88.github.io/winepick/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://jongho88.github.io/winepick/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="WinePick">
@@ -346,6 +356,8 @@ main .stats + .medals .medal{color:#FBE3EA}
 .brand{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:transform .5s ease}
 .brand.pressing{transform:scale(.92)}
 .sister{font-size:12px;color:#B39098;text-decoration:none;letter-spacing:.04em;opacity:.8}
+.share-url{font-size:15px;font-weight:700;color:var(--wine);background:#FBF3F5;border:1px dashed #E7B7BE;border-radius:10px;padding:8px 10px;text-align:center;margin:4px 0 10px;letter-spacing:.02em}
+.qrbox{width:220px;height:220px;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
 </style>
 </head>
 <body>
@@ -1461,7 +1473,7 @@ function openRecord(id,styleId){
 function openSettings(){
   openSheet(`<h2 style="margin-top:4px">설정</h2><div class="card" style="margin-top:8px">
   <div class="field" style="margin-top:0"><label>가격 단위</label><div class="seg" id="cur"><button type="button" data-c="KRW" class="${settings.currency==='KRW'?'on':''}">원 (₩)</button><button type="button" data-c="USD" class="${settings.currency==='USD'?'on':''}">달러 ($)</button></div></div></div>
-  <div class="card" style="margin:16px 0"><h3>친구에게 알려 주기</h3><p class="small muted">이 앱 주소를 복사해서 카톡이나 문자로 보내세요. 친구 기록은 친구 폰에만 저장돼요.</p><button class="btn soft block" id="share">주소 복사하기</button></div>
+  <div class="card" style="margin:16px 0"><h3>친구에게 알려 주기</h3><p class="small muted">주소를 카톡이나 문자로 보내거나, 옆에 있는 친구에게 QR 코드를 보여 주세요. 친구 기록은 친구 폰에만 저장돼요.</p><div class="share-url">${SHARE_URL.replace('https://','')}</div><div class="row"><button class="btn soft" id="share">주소 복사하기</button><button class="btn ghost" id="showQR">QR 코드 보기</button></div></div>
   <div class="card" style="margin:16px 0"><h3>백업</h3><p class="small muted">기록은 이 폰의 이 브라우저에만 저장돼요. 브라우저 데이터를 지우면 사라지니 가끔 백업해 두세요.</p>
     <div class="row"><button class="btn ghost" id="exp">백업 복사</button><button class="btn ghost" id="imp">백업 불러오기</button></div>
     <textarea id="bk" style="display:none;width:100%;min-height:110px;margin-top:10px;border:1.5px solid var(--line);border-radius:12px;padding:10px;font-size:13px" placeholder="복사해 둔 백업 내용을 여기에 붙여 넣으세요"></textarea>
@@ -1473,9 +1485,15 @@ function openSettings(){
   const back=()=>{closeSheet();render();};
     s.querySelectorAll('#cur button').forEach(b=>b.onclick=()=>{settings.currency=b.dataset.c;store.set('settings',settings);s.querySelectorAll('#cur button').forEach(x=>x.classList.toggle('on',x===b));toast('가격 단위를 바꿨어요');if(S.tab==='pick')render();});
     s.querySelector('#share').onclick=async()=>{
-      const url=location.href.split('#')[0];
+      const url=SHARE_URL;
       try{if(navigator.share){await navigator.share({title:'WinePick',text:'와인 초보를 위한 와인 추천 앱이에요',url});return;}}catch(e){if(e&&e.name==='AbortError')return;}
       copyText(url,'주소를 복사했어요');
+    };
+    s.querySelector('#showQR').onclick=()=>{
+      const o=document.createElement('div');o.className='celebrate';
+      o.innerHTML=`<div class="cel-card"><div class="cel-k">WinePick</div><div class="cel-n" style="font-size:20px;margin:4px 0 12px">카메라로 찍으면 바로 열려요</div><div class="qrbox">${QR_SVG}</div><div class="share-url" style="margin:12px 0 14px">${SHARE_URL.replace('https://','')}</div><button class="btn block">닫기</button></div>`;
+      o.onclick=e=>{if(e.target===o||e.target.closest('button'))o.remove();};
+      document.body.appendChild(o);
     };
     const bk=s.querySelector('#bk'),goBtn=s.querySelector('#impGo');
     s.querySelector('#exp').onclick=()=>{
@@ -1509,6 +1527,8 @@ $('#settingsBtn').onclick=openSettings;
 S.level=store.get('level','basic')||'basic';
 function fromHash(){const h=(location.hash||'').slice(1);if(['home','learn','pick','log'].includes(h)){S.tab=h;}}
 /* ---------- CocktailPick 연결 ---------- */
+const SHARE_URL='https://bit.ly/winepick'; // 친구에게 보내는 주소 (Bitly)
+const QR_SVG="<svg viewBox=\"-2 -2 33 33\" width=\"100%\" height=\"100%\" shape-rendering=\"crispEdges\" aria-label=\"WinePick QR \ucf54\ub4dc\"><rect x=\"-2\" y=\"-2\" width=\"33\" height=\"33\" fill=\"#fff\"/><path d=\"M2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM5 2h1v1h-1zM6 2h1v1h-1zM7 2h1v1h-1zM8 2h1v1h-1zM13 2h1v1h-1zM14 2h1v1h-1zM15 2h1v1h-1zM18 2h1v1h-1zM20 2h1v1h-1zM21 2h1v1h-1zM22 2h1v1h-1zM23 2h1v1h-1zM24 2h1v1h-1zM25 2h1v1h-1zM26 2h1v1h-1zM2 3h1v1h-1zM8 3h1v1h-1zM11 3h1v1h-1zM15 3h1v1h-1zM16 3h1v1h-1zM17 3h1v1h-1zM18 3h1v1h-1zM20 3h1v1h-1zM26 3h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM10 4h1v1h-1zM13 4h1v1h-1zM17 4h1v1h-1zM20 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM26 4h1v1h-1zM2 5h1v1h-1zM4 5h1v1h-1zM5 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h1v1h-1zM11 5h1v1h-1zM12 5h1v1h-1zM15 5h1v1h-1zM16 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM23 5h1v1h-1zM24 5h1v1h-1zM26 5h1v1h-1zM2 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM11 6h1v1h-1zM13 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM23 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM11 7h1v1h-1zM14 7h1v1h-1zM16 7h1v1h-1zM17 7h1v1h-1zM18 7h1v1h-1zM20 7h1v1h-1zM26 7h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1zM4 8h1v1h-1zM5 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM21 8h1v1h-1zM22 8h1v1h-1zM23 8h1v1h-1zM24 8h1v1h-1zM25 8h1v1h-1zM26 8h1v1h-1zM10 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM16 9h1v1h-1zM18 9h1v1h-1zM2 10h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM14 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM21 10h1v1h-1zM22 10h1v1h-1zM23 10h1v1h-1zM24 10h1v1h-1zM9 11h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM13 11h1v1h-1zM16 11h1v1h-1zM18 11h1v1h-1zM21 11h1v1h-1zM25 11h1v1h-1zM2 12h1v1h-1zM6 12h1v1h-1zM8 12h1v1h-1zM9 12h1v1h-1zM10 12h1v1h-1zM12 12h1v1h-1zM13 12h1v1h-1zM14 12h1v1h-1zM17 12h1v1h-1zM18 12h1v1h-1zM22 12h1v1h-1zM23 12h1v1h-1zM25 12h1v1h-1zM26 12h1v1h-1zM3 13h1v1h-1zM4 13h1v1h-1zM7 13h1v1h-1zM9 13h1v1h-1zM18 13h1v1h-1zM19 13h1v1h-1zM20 13h1v1h-1zM26 13h1v1h-1zM2 14h1v1h-1zM6 14h1v1h-1zM8 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM19 14h1v1h-1zM20 14h1v1h-1zM22 14h1v1h-1zM24 14h1v1h-1zM25 14h1v1h-1zM26 14h1v1h-1zM2 15h1v1h-1zM3 15h1v1h-1zM4 15h1v1h-1zM5 15h1v1h-1zM6 15h1v1h-1zM9 15h1v1h-1zM10 15h1v1h-1zM15 15h1v1h-1zM19 15h1v1h-1zM21 15h1v1h-1zM23 15h1v1h-1zM25 15h1v1h-1zM2 16h1v1h-1zM4 16h1v1h-1zM6 16h1v1h-1zM8 16h1v1h-1zM11 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM17 16h1v1h-1zM18 16h1v1h-1zM19 16h1v1h-1zM20 16h1v1h-1zM21 16h1v1h-1zM22 16h1v1h-1zM23 16h1v1h-1zM25 16h1v1h-1zM26 16h1v1h-1zM2 17h1v1h-1zM4 17h1v1h-1zM5 17h1v1h-1zM7 17h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM22 17h1v1h-1zM26 17h1v1h-1zM2 18h1v1h-1zM3 18h1v1h-1zM4 18h1v1h-1zM5 18h1v1h-1zM7 18h1v1h-1zM8 18h1v1h-1zM10 18h1v1h-1zM11 18h1v1h-1zM13 18h1v1h-1zM15 18h1v1h-1zM16 18h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1zM20 18h1v1h-1zM21 18h1v1h-1zM22 18h1v1h-1zM24 18h1v1h-1zM10 19h1v1h-1zM11 19h1v1h-1zM12 19h1v1h-1zM14 19h1v1h-1zM18 19h1v1h-1zM22 19h1v1h-1zM23 19h1v1h-1zM2 20h1v1h-1zM3 20h1v1h-1zM4 20h1v1h-1zM5 20h1v1h-1zM6 20h1v1h-1zM7 20h1v1h-1zM8 20h1v1h-1zM15 20h1v1h-1zM18 20h1v1h-1zM20 20h1v1h-1zM22 20h1v1h-1zM24 20h1v1h-1zM25 20h1v1h-1zM26 20h1v1h-1zM2 21h1v1h-1zM8 21h1v1h-1zM10 21h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM14 21h1v1h-1zM16 21h1v1h-1zM18 21h1v1h-1zM22 21h1v1h-1zM23 21h1v1h-1zM25 21h1v1h-1zM2 22h1v1h-1zM4 22h1v1h-1zM5 22h1v1h-1zM6 22h1v1h-1zM8 22h1v1h-1zM10 22h1v1h-1zM12 22h1v1h-1zM14 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM17 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM21 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM25 22h1v1h-1zM26 22h1v1h-1zM2 23h1v1h-1zM4 23h1v1h-1zM5 23h1v1h-1zM6 23h1v1h-1zM8 23h1v1h-1zM10 23h1v1h-1zM11 23h1v1h-1zM12 23h1v1h-1zM15 23h1v1h-1zM17 23h1v1h-1zM20 23h1v1h-1zM22 23h1v1h-1zM23 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM26 23h1v1h-1zM2 24h1v1h-1zM4 24h1v1h-1zM5 24h1v1h-1zM6 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM13 24h1v1h-1zM14 24h1v1h-1zM15 24h1v1h-1zM18 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM26 24h1v1h-1zM2 25h1v1h-1zM8 25h1v1h-1zM12 25h1v1h-1zM13 25h1v1h-1zM16 25h1v1h-1zM17 25h1v1h-1zM18 25h1v1h-1zM19 25h1v1h-1zM21 25h1v1h-1zM22 25h1v1h-1zM23 25h1v1h-1zM26 25h1v1h-1zM2 26h1v1h-1zM3 26h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM10 26h1v1h-1zM12 26h1v1h-1zM13 26h1v1h-1zM14 26h1v1h-1zM21 26h1v1h-1zM22 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM25 26h1v1h-1zM26 26h1v1h-1z\" fill=\"#22070E\"/></svg>";
 const COCKTAILPICK_URL='https://claude.ai/artifact/NQuTpAUpEdxKHQf8SZfh3F'; // GitHub에 올리면 https://jongho88.github.io/cocktailpick/ 로 바꾸세요
 function cocktailSVG(w){return `<svg width="${w}" height="${w*1.2}" viewBox="0 0 80 96" aria-hidden="true"><defs><linearGradient id="ckg" x1="0" x2="1"><stop offset="0" stop-color="#5E8F22"/><stop offset=".45" stop-color="#A8D86A"/><stop offset="1" stop-color="#5E8F22"/></linearGradient></defs>
 <path d="M8 14H72L40 52Z" fill="rgba(255,255,255,.12)" stroke="#F3E6DA" stroke-width="1.6" stroke-linejoin="round"/><path d="M14.5 20H65.5L40 50Z" fill="url(#ckg)"/><path d="M20 22L30 22L40 46" stroke="#fff" stroke-opacity=".45" stroke-width="2" fill="none" stroke-linecap="round"/>
