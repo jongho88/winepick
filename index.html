@@ -358,6 +358,19 @@ main .stats + .medals .medal{color:#FBE3EA}
 .sister{font-size:12px;color:#B39098;text-decoration:none;letter-spacing:.04em;opacity:.8}
 .share-url{font-size:15px;font-weight:700;color:var(--wine);background:#FBF3F5;border:1px dashed #E7B7BE;border-radius:10px;padding:8px 10px;text-align:center;margin:4px 0 10px;letter-spacing:.02em}
 .qrbox{width:220px;height:220px;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+/* 사진 자르기 */
+.crop-ov{position:fixed;inset:0;z-index:60;background:#140308;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));animation:fade .2s}
+.crop-top{text-align:center;color:#FBE3EA}.crop-top b{display:block;font-size:17px;font-weight:600}.crop-top span{font-size:13px;color:#C99AA6}
+.crop-stage{position:relative;width:min(78vw,340px,calc((100vh - 260px)*.75));aspect-ratio:3/4;overflow:hidden;border-radius:14px;background:#000;touch-action:none;cursor:grab;box-shadow:0 0 0 2px rgba(247,199,210,.7),0 10px 30px rgba(0,0,0,.5)}
+.crop-stage:active{cursor:grabbing}
+.crop-stage img{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;user-select:none;-webkit-user-select:none;pointer-events:none}
+.crop-grid{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 33.2%,rgba(255,255,255,.25) 33.3%,rgba(255,255,255,.25) 33.5%,transparent 33.6%,transparent 66.5%,rgba(255,255,255,.25) 66.6%,rgba(255,255,255,.25) 66.8%,transparent 66.9%),linear-gradient(0deg,transparent 33.2%,rgba(255,255,255,.25) 33.3%,rgba(255,255,255,.25) 33.5%,transparent 33.6%,transparent 66.5%,rgba(255,255,255,.25) 66.6%,rgba(255,255,255,.25) 66.8%,transparent 66.9%)}
+.crop-zoom{display:flex;align-items:center;gap:10px;width:min(78vw,340px)}
+.crop-zoom input{flex:1;accent-color:#E0315F}
+.crop-zoom button{width:36px;height:36px;border-radius:50%;border:1px solid rgba(247,199,210,.4);background:rgba(255,255,255,.06);color:#F7C7D2;font-size:20px;line-height:1}
+.crop-btns{display:flex;gap:8px;width:min(86vw,360px)}.crop-btns .btn{flex:1;min-height:46px;padding:10px}
+.crop-btns .btn.ghost{color:#F7C7D2;border-color:rgba(247,199,210,.5)}
+.pp-btns button{font-size:14px}
 </style>
 </head>
 <body>
@@ -1293,6 +1306,49 @@ const PDB={db:null,
   async set(k,v){memPhotos[k]=v;const db=await this.open();if(!db)return;return new Promise(res=>{try{const tx=db.transaction('photos','readwrite');tx.objectStore('photos').put(v,k);tx.oncomplete=()=>res();tx.onerror=()=>res();}catch(e){res();}});},
   async del(k){delete memPhotos[k];const db=await this.open();if(!db)return;try{db.transaction('photos','readwrite').objectStore('photos').delete(k);}catch(e){}}
 };
+/* ---------- 사진 위치·크기 조정 ---------- */
+function openCropper(src){
+  return new Promise(resolve=>{
+    const o=document.createElement('div');o.className='crop-ov';
+    o.innerHTML=`<div class="crop-top"><b>사진 위치 맞추기</b><span>두 손가락으로 확대·축소하고, 끌어서 위치를 옮겨요</span></div>
+    <div class="crop-stage" id="cStage"><img id="cImg" alt="" draggable="false"><div class="crop-grid"></div></div>
+    <div class="crop-zoom"><button type="button" id="cOut" aria-label="축소">−</button><input type="range" id="cRange" min="0" max="100" value="0" aria-label="확대 정도"><button type="button" id="cIn" aria-label="확대">+</button></div>
+    <div class="crop-btns"><button type="button" class="btn ghost" id="cCancel">취소</button><button type="button" class="btn ghost" id="cReset">원래대로</button><button type="button" class="btn" id="cOk">사용하기</button></div>`;
+    document.body.appendChild(o);
+    const st=o.querySelector('#cStage'),im=o.querySelector('#cImg'),rg=o.querySelector('#cRange');
+    let W=0,H=0,iw=0,ih=0,minS=1,maxS=4,s=1,tx=0,ty=0;
+    const pts=new Map();let last=null;
+    const clamp=()=>{s=Math.max(minS,Math.min(maxS,s));tx=Math.min(0,Math.max(W-iw*s,tx));ty=Math.min(0,Math.max(H-ih*s,ty));};
+    const draw=()=>{clamp();im.style.transform=`translate(${tx}px,${ty}px) scale(${s})`;rg.value=Math.round((s-minS)/(maxS-minS)*100);};
+    const zoomAt=(ns,cx,cy)=>{ns=Math.max(minS,Math.min(maxS,ns));tx=cx-(cx-tx)*ns/s;ty=cy-(cy-ty)*ns/s;s=ns;draw();};
+    const fit=()=>{s=minS;tx=(W-iw*s)/2;ty=(H-ih*s)/2;draw();};
+    im.onload=()=>{iw=im.naturalWidth;ih=im.naturalHeight;const r=st.getBoundingClientRect();W=r.width;H=r.height;minS=Math.max(W/iw,H/ih);maxS=minS*4;fit();};
+    im.onerror=()=>{close(null);toast('이 사진은 열 수 없어요');};
+    im.src=src;
+    const local=e=>{const r=st.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];};
+    st.addEventListener('pointerdown',e=>{st.setPointerCapture(e.pointerId);pts.set(e.pointerId,local(e));last=null;});
+    st.addEventListener('pointermove',e=>{
+      if(!pts.has(e.pointerId))return;const prev=pts.get(e.pointerId),cur=local(e);pts.set(e.pointerId,cur);
+      if(pts.size===1){tx+=cur[0]-prev[0];ty+=cur[1]-prev[1];draw();}
+      else if(pts.size===2){const [a,b]=[...pts.values()];const dist=Math.hypot(a[0]-b[0],a[1]-b[1]),mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+        if(last){tx+=mid[0]-last.mid[0];ty+=mid[1]-last.mid[1];zoomAt(s*dist/last.dist,mid[0],mid[1]);}last={dist,mid};}
+    });
+    const up=e=>{pts.delete(e.pointerId);last=null;};
+    ['pointerup','pointercancel','pointerleave'].forEach(ev=>st.addEventListener(ev,up));
+    st.addEventListener('wheel',e=>{e.preventDefault();const [x,y]=local(e);zoomAt(s*(e.deltaY<0?1.08:1/1.08),x,y);},{passive:false});
+    rg.oninput=()=>zoomAt(minS+(maxS-minS)*rg.value/100,W/2,H/2);
+    o.querySelector('#cIn').onclick=()=>zoomAt(s*1.15,W/2,H/2);
+    o.querySelector('#cOut').onclick=()=>zoomAt(s/1.15,W/2,H/2);
+    o.querySelector('#cReset').onclick=fit;
+    function close(v){o.remove();resolve(v);}
+    o.querySelector('#cCancel').onclick=()=>close(null);
+    o.querySelector('#cOk').onclick=()=>{
+      try{const OW=600,OH=800,c=document.createElement('canvas');c.width=OW;c.height=OH;const g=c.getContext('2d');
+        g.fillStyle='#fff';g.fillRect(0,0,OW,OH);g.drawImage(im,-tx/s,-ty/s,W/s,H/s,0,0,OW,OH);close(c.toDataURL('image/jpeg',.8));}
+      catch(e){toast('사진을 저장하지 못했어요');close(null);}
+    };
+  });
+}
 function shrinkPhoto(file,max=720,q=.72){
   return new Promise((res,rej)=>{
     const url=URL.createObjectURL(file);const img=new Image();
@@ -1430,14 +1486,18 @@ function openRecord(id,styleId){
     let type=d.type||'red';
     let cur=d.cur||settings.currency;let newPhoto=null,removePhoto=false;
     const pp=s.querySelector('#pp'),fp=s.querySelector('#fPhoto');
-    const drawPick=src=>{pp.innerHTML=src?`<img src="${src}" alt="와인 사진"><div class="pp-btns"><button type="button" id="ppChange">사진 바꾸기</button><button type="button" id="ppDel">지우기</button></div>`:`<button type="button" class="pp-empty" id="ppAdd"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg><span>사진 찍기 · 앨범에서 고르기</span></button>`;
+    let curSrc=null;
+    const drawPick=src=>{curSrc=src;pp.innerHTML=src?`<img src="${src}" alt="와인 사진"><div class="pp-btns"><button type="button" id="ppEdit">위치 조정</button><button type="button" id="ppChange">사진 바꾸기</button><button type="button" id="ppDel">지우기</button></div>`:`<button type="button" class="pp-empty" id="ppAdd"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg><span>사진 찍기 · 앨범에서 고르기</span></button>`;
       const a=pp.querySelector('#ppAdd'),c=pp.querySelector('#ppChange'),x=pp.querySelector('#ppDel');
       if(a)a.onclick=()=>fp.click();if(c)c.onclick=()=>fp.click();
+      const ed=pp.querySelector('#ppEdit');if(ed)ed.onclick=async()=>{const out=await openCropper(curSrc);if(out){newPhoto=out;removePhoto=false;drawPick(out);}};
       if(x)x.onclick=()=>{newPhoto=null;removePhoto=true;drawPick(null);};};
     drawPick(null);
     if(d.photo)PDB.get(d.photo).then(src=>{if(src&&!newPhoto&&!removePhoto)drawPick(src);});
-    fp.onchange=async()=>{const f=fp.files&&fp.files[0];if(!f)return;pp.innerHTML='<div class="pp-empty">사진 줄이는 중…</div>';
-      try{newPhoto=await shrinkPhoto(f);removePhoto=false;drawPick(newPhoto);}catch(e){toast('이 사진은 열 수 없어요');drawPick(null);}fp.value='';};
+    fp.onchange=async()=>{const f=fp.files&&fp.files[0];if(!f)return;fp.value='';
+      let url=null;try{url=URL.createObjectURL(f);}catch(e){}
+      const out=url?await openCropper(url):null;if(url)URL.revokeObjectURL(url);
+      if(out){newPhoto=out;removePhoto=false;drawPick(out);}};
     const curBtn=s.querySelector('#fCur'),priceIn=s.querySelector('#fPrice');
     curBtn.onclick=()=>{cur=cur==='KRW'?'USD':'KRW';curBtn.textContent=cur==='KRW'?'₩':'$';priceIn.placeholder=cur==='KRW'?'25,000':'18';};
     priceIn.addEventListener('blur',()=>{const n=parseFloat(priceIn.value.replace(/[^0-9.]/g,''));if(!isNaN(n)&&cur==='KRW')priceIn.value=Math.round(n).toLocaleString('ko-KR');});
