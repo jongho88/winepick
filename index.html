@@ -137,8 +137,11 @@ b + .en{font-style:italic}
 .empty svg{width:70px;opacity:.5}
 /* sheet */
 .scrim{position:fixed;inset:0;background:rgba(30,10,15,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
-.sheet{background:var(--cream);width:100%;max-width:520px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:10px 18px calc(20px + env(safe-area-inset-bottom));animation:up .25s ease-out}
+.sheet{background:var(--cream);width:100%;max-width:520px;max-height:72vh;max-height:72dvh;overflow:auto;overscroll-behavior:contain;position:relative;border-radius:24px 24px 0 0;padding:10px 18px calc(20px + env(safe-area-inset-bottom));animation:up .25s ease-out}
 .grab{width:40px;height:5px;border-radius:3px;background:#D8C9BF;margin:4px auto 10px}
+.sheet-top{position:sticky;top:-10px;z-index:2;background:var(--cream);margin:-10px -18px 0;padding:10px 18px 2px}
+.sheet-x{position:absolute;right:12px;top:8px;width:34px;height:34px;border-radius:50%;border:0;background:#EFE6DE;color:#6b5a5c;display:grid;place-items:center}
+.scrim{cursor:pointer}.sheet{cursor:auto}
 @keyframes up{from{transform:translateY(40px);opacity:.5}}
 @keyframes fade{from{opacity:0}}
 .field{margin:14px 0}
@@ -269,7 +272,7 @@ h1.thin{font-weight:300;font-size:22px;letter-spacing:.01em;margin:16px 0 2px}
 .cellar-cta b{color:#fff}
 /* 사진 */
 .photo-pick{border-radius:14px;overflow:hidden;background:#fff;border:1.5px dashed var(--line)}
-.photo-pick img{display:block;width:100%;max-height:300px;object-fit:cover}
+.photo-pick img{display:block;width:100%;max-height:190px;object-fit:cover}
 .pp-empty{width:100%;border:0;background:none;padding:22px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--wine);font-weight:600;font-size:15px}
 .pp-btns{display:flex;border-top:1px solid var(--line)}
 .pp-btns button{flex:1;border:0;background:#fff;padding:11px;font-weight:600;color:var(--wine)}
@@ -306,6 +309,20 @@ main .stats + .medals .medal{color:#FBE3EA}
 .secret.up{transform:none}
 .secret svg{width:48px;height:136px;margin-top:14px}
 .somm .cel-medal svg{filter:drop-shadow(0 8px 14px rgba(0,0,0,.4))}
+.prods{background:#FBF7F1;border:1px solid var(--line);border-radius:14px;padding:12px 12px 8px;margin:12px 0}
+.prods-h{font-size:14px;font-weight:700;color:var(--wine);margin-bottom:4px}
+.prods-h span{font-weight:500;color:var(--muted);font-size:12px;margin-left:4px}
+.prod{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.prod:first-of-type{border-top:0}
+.pn{flex:1;min-width:0}
+.pn b{display:block;font-size:14.5px;line-height:1.35}
+.pn small{display:block;font-size:12px;color:var(--muted);font-style:italic;line-height:1.35}
+.pr{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.tier{font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;background:#F1ECE7;color:var(--muted)}
+.tier.t3{background:#FFF3DA;color:#9A6B12}
+.tier.fit{background:var(--wine);color:#fff}
+.pr a{font-size:12px;color:var(--wine3);font-weight:600;text-decoration:none}
+.prods-note{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -358,7 +375,7 @@ main .stats + .medals .medal{color:#FBE3EA}
     <svg class="sp-flourish" viewBox="0 0 230 26"><path d="M10 14C50 22 90 4 120 12S175 24 220 8" fill="none" stroke="#E9BC6E" stroke-width="1.6" stroke-linecap="round"/><circle cx="220" cy="8" r="2.4" fill="#E9BC6E" style="opacity:0;animation:tag .3s ease 3.4s forwards"/></svg>
   </div>
   <div class="sp-tag">내 입맛에 꼭 맞는 와인 찾기</div>
-  <div class="sp-skip"><span class="tapdot"></span>화면을 눌러 시작하기</div>
+  <div class="sp-skip"><span class="tapdot"></span>눌러서 바로 시작하기</div>
 </div>
 <div id="app">
   <header class="top">
@@ -442,6 +459,32 @@ const WINES=[
  {id:'port',name:'포트 와인',type:'dessert',grape:'포르투갈 토착 품종',s:5,a:2,t:3,b:5,price:[2,3],food:['dessert','cheese'],occ:['gift','alone'],aroma:'건포도, 캐러멜, 초콜릿, 견과',desc:'달고 진하며 도수가 20% 정도로 높아요. 작은 잔에 조금씩, 초콜릿이나 블루치즈와 마셔요. 열고 나서도 몇 주 보관돼요.',temp:'14~16°C',ex:"그레이엄스(Graham's), 테일러스(Taylor's)"}
 ];
 const WMAP=Object.fromEntries(WINES.map(w=>[w.id,w]));
+// 대표 제품 [한글 이름, 영어 이름(라벨), 가격대 1=부담 없이 2=적당히 3=특별한 날]
+const PRODUCTS={
+ 'cab-chile':[['카시예로 델 디아블로 카베르네 소비뇽','Casillero del Diablo Cabernet Sauvignon',1],['산타 리타 120 카베르네 소비뇽','Santa Rita 120 Cabernet Sauvignon',1],['코노 수르 비시클레타 카베르네 소비뇽','Cono Sur Bicicleta Cabernet Sauvignon',1],['몬테스 알파 카베르네 소비뇽','Montes Alpha Cabernet Sauvignon',2],['알마비바','Almaviva',3]],
+ 'cab-cal':[['조쉬 셀러 카베르네 소비뇽','Josh Cellars Cabernet Sauvignon',1],['켄달 잭슨 빈트너스 리저브 카베르네','Kendall-Jackson Vintner\'s Reserve Cabernet Sauvignon',2],['루이 마티니 소노마 카베르네','Louis M. Martini Sonoma County Cabernet Sauvignon',2],['로버트 몬다비 나파 밸리 카베르네','Robert Mondavi Napa Valley Cabernet Sauvignon',3],['케이머스 나파 밸리 카베르네','Caymus Napa Valley Cabernet Sauvignon',3]],
+ 'pinot':[['메이오미 피노 누아','Meiomi Pinot Noir',2],['라 크레마 소노마 코스트 피노 누아','La Crema Sonoma Coast Pinot Noir',2],['에라스 오리건 피노 누아','Erath Oregon Pinot Noir',2],['루이 자도 부르고뉴 피노 누아','Louis Jadot Bourgogne Pinot Noir',2]],
+ 'merlot':[['카시예로 델 디아블로 메를로','Casillero del Diablo Merlot',1],['14 핸즈 메를로','14 Hands Merlot',1],['컬럼비아 크레스트 그랜드 에스테이트 메를로','Columbia Crest Grand Estates Merlot',1],['덕혼 나파 밸리 메를로','Duckhorn Napa Valley Merlot',3]],
+ 'malbec':[['알라모스 말벡','Alamos Malbec',1],['트라피체 오크 캐스크 말벡','Trapiche Oak Cask Malbec',1],['카테나 말벡','Catena Malbec',2],['주카르디 Q 말벡','Zuccardi Q Malbec',2]],
+ 'shiraz':[['옐로우 테일 쉬라즈','Yellow Tail Shiraz',1],['제이콥스 크릭 쉬라즈','Jacob\'s Creek Shiraz',1],['펜폴즈 쿠눙가 힐 쉬라즈','Penfolds Koonunga Hill Shiraz',1],['펜폴즈 빈 28 쉬라즈','Penfolds Bin 28 Shiraz',2]],
+ 'chianti':[['루피노 키안티','Ruffino Chianti',1],['카스텔로 디 가비아노 키안티 클라시코','Castello di Gabbiano Chianti Classico',1],['안티노리 페폴리 키안티 클라시코','Antinori Pèppoli Chianti Classico',2],['루피노 리제르바 두칼레','Ruffino Riserva Ducale Chianti Classico',2]],
+ 'rioja':[['쿠네 크리안사','CVNE Cune Rioja Crianza',1],['캄포 비에호 리제르바','Campo Viejo Rioja Reserva',1],['마르케스 데 리스칼 리제르바','Marqués de Riscal Rioja Reserva',2],['파우스티노 I 그란 리제르바','Faustino I Gran Reserva',2]],
+ 'zin':[['보글 올드 바인 진판델','Bogle Old Vine Zinfandel',1],['레이븐스우드 빈트너스 블렌드 진판델','Ravenswood Vintners Blend Zinfandel',1],['세게시오 소노마 진판델','Seghesio Sonoma Zinfandel',2],['릿지 쓰리 밸리스','Ridge Three Valleys',2]],
+ 'sb-nz':[['오이스터 베이 소비뇽 블랑','Oyster Bay Sauvignon Blanc',1],['킴 크로포드 소비뇽 블랑','Kim Crawford Sauvignon Blanc',1],['빌라 마리아 프라이빗 빈 소비뇽 블랑','Villa Maria Private Bin Sauvignon Blanc',1],['화이트헤이븐 소비뇽 블랑','Whitehaven Sauvignon Blanc',2],['클라우디 베이 소비뇽 블랑','Cloudy Bay Sauvignon Blanc',2]],
+ 'chard-cal':[['조쉬 셀러 샤르도네','Josh Cellars Chardonnay',1],['켄달 잭슨 빈트너스 리저브 샤르도네','Kendall-Jackson Vintner\'s Reserve Chardonnay',1],['라 크레마 소노마 코스트 샤르도네','La Crema Sonoma Coast Chardonnay',2],['롬바우어 샤르도네','Rombauer Chardonnay',3]],
+ 'chablis':[['라 샤블리지엔 샤블리','La Chablisienne Chablis',2],['루이 자도 샤블리','Louis Jadot Chablis',2],['조셉 드루앵 샤블리','Joseph Drouhin Chablis',2],['윌리엄 페브르 샤블리','William Fèvre Chablis',2]],
+ 'riesling':[['닥터 루젠 닥터 엘 리슬링','Dr. Loosen Dr. L Riesling',1],['샤토 생 미셸 리슬링','Chateau Ste. Michelle Riesling',1],['닥터 루젠 벨레너 조넨우어 카비넷','Dr. Loosen Wehlener Sonnenuhr Kabinett',2]],
+ 'pg':[['카비트 피노 그리지오','Cavit Pinot Grigio',1],['에코 도마니 피노 그리지오','Ecco Domani Pinot Grigio',1],['산타 마르게리타 피노 그리지오','Santa Margherita Pinot Grigio',2]],
+ 'rose':[['라 비에유 페름 로제','La Vieille Ferme Rosé',1],['위스퍼링 엔젤','Whispering Angel Rosé',2],['엠 드 미뉘티','M de Minuty Rosé',2],['미라발 로제','Miraval Rosé',2]],
+ 'prosecco':[['라 마르카 프로세코','La Marca Prosecco',1],['미오네토 프로세코 브뤼','Mionetto Prosecco Brut',1],['루피노 프로세코','Ruffino Prosecco',1],['조닌 프로세코','Zonin Prosecco',1]],
+ 'cava':[['프레시넷 코르동 네그로','Freixenet Cordon Negro Brut',1],['세구라 비우다스 브뤼 리저바','Segura Viudas Brut Reserva',1],['안나 데 코도르니우','Anna de Codorníu Brut',1]],
+ 'champagne':[['니콜라 푀이야트 브뤼 리저브','Nicolas Feuillatte Brut Réserve',2],['모엣 샹동 임페리얼 브뤼','Moët & Chandon Impérial Brut',3],['뵈브 클리코 옐로 라벨','Veuve Clicquot Yellow Label Brut',3],['떼땅져 브뤼 리저브','Taittinger Brut Réserve',3]],
+ 'moscato':[['미켈레 키아를로 니볼레','Michele Chiarlo Nivole Moscato d\'Asti',1],['사라코 모스카토 다스티','Saracco Moscato d\'Asti',1],['비에티 카시네타','Vietti Cascinetta Moscato d\'Asti',2]],
+ 'brachetto':[['반피 로사 레갈레','Banfi Rosa Regale Brachetto d\'Acqui',2],['브라이다 브라케토 다퀴','Braida Brachetto d\'Acqui',2],['마렌코 피네토','Marenco Pineto Brachetto d\'Acqui',2]],
+ 'port':[['샌드맨 파운더스 리저브','Sandeman Founders Reserve Port',1],['그레이엄스 식스 그레이프스','Graham\'s Six Grapes Reserve Port',2],['폰세카 빈 27','Fonseca Bin 27 Port',2],['테일러스 10년 토니','Taylor Fladgate 10 Year Old Tawny Port',2]]
+};
+const TIER={1:'부담 없이',2:'적당히',3:'특별한 날'};
+
 
 const QUIZ=[
  {id:'coffee',q:'커피는 보통 어떻게 마셔요?',hint:'단맛과 떫은맛 취향을 알아봐요',opts:[['black','아메리카노·블랙커피'],['latte','라떼처럼 부드럽게'],['sweet','달달한 커피·믹스커피'],['no','커피는 잘 안 마셔요']]},
@@ -594,7 +637,8 @@ function nickname(T,type){
 }
 
 /* ---------- 화면 ---------- */
-function render(){
+function render(){try{renderInner();}catch(e){console.error(e);view.innerHTML='<div class="card"><p>화면을 그리는 중 문제가 생겼어요. 새로고침해 주세요.</p></div>';}}
+function renderInner(){
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.go===S.tab));
   ({home:renderHome,learn:renderLearn,pick:renderPick,log:renderLog,settings:renderSettings})[S.tab]();
   window.scrollTo(0,0);
@@ -749,22 +793,24 @@ function renderResult(res){
     <p class="small muted" style="margin:12px 0 0">${res.ans.food?esc(FOOD[res.ans.food]):''}${res.ans.occ?' · '+esc(OCC[res.ans.occ]):''}${+res.ans.budget?' · '+esc(PRICE[settings.currency][res.ans.budget]):''}</p>
   </div>
   <h1 class="thin" style="margin-top:24px">추천 와인 ${res.items.length}개</h1>
-  ${res.items.map((it,i)=>wineCard(WMAP[it.id],it.why,i)).join('')}
+  ${res.items.map((it,i)=>wineCard(WMAP[it.id],it.why,i,+res.ans.budget||0)).join('')}
   <div class="tip">🛒 와인 가게에서는 추천 이름을 보여 주면서 "이런 스타일로 추천해 주세요"라고 물어보세요. 예시 제품은 가게마다 없을 수도 있어요.</div>
   <div class="row" style="margin-top:8px"><button class="btn ghost" id="redo">다시 하기</button><button class="btn" data-go="log">기록하러 가기</button></div>`;
   $('#redo').onclick=startQuiz;
   bindWineActions();
 }
-function wineCard(w,why,i){
+function wineCard(w,why,i,budget){
   if(!w)return'';
   const P=PRICE[settings.currency];
+  const list=(PRODUCTS[w.id]||[]).slice().sort((a,b)=>(budget?(a[2]==budget?0:1)-(b[2]==budget?0:1):0)||a[2]-b[2]);
   return `<article class="wine">
    <div class="whead"><div class="g">${glass(w.type,36)}</div><div><div class="rank">추천 ${i+1}</div><h3 style="font-size:19px">${esc(w.name)}</h3><span class="chip">${TYPES[w.type].label}</span><span class="chip gray">${esc(w.grape)}</span></div></div>
    <div class="wbody">
      <p>${esc(w.desc)}</p>
      <div class="why"><b class="small" style="color:var(--wine3)">이래서 골랐어요</b>${why.map(x=>`<div>· ${esc(x)}</div>`).join('')}</div>
      ${tasteBlock(w)}
-     <dl class="kv"><dt>향</dt><dd>${esc(w.aroma)}</dd><dt>잘 맞는 음식</dt><dd>${w.food.filter(f=>FOODSHORT[f]).map(f=>FOODSHORT[f]).join(', ')}</dd><dt>가격대</dt><dd>${w.price.map(p=>P[p]).join(' / ')}</dd><dt>마시는 온도</dt><dd>${esc(w.temp)}</dd><dt>예시</dt><dd>${esc(w.ex)}</dd></dl>
+     <dl class="kv"><dt>향</dt><dd>${esc(w.aroma)}</dd><dt>잘 맞는 음식</dt><dd>${w.food.filter(f=>FOODSHORT[f]).map(f=>FOODSHORT[f]).join(', ')}</dd><dt>가격대</dt><dd>${w.price.map(p=>P[p]).join(' / ')}</dd><dt>마시는 온도</dt><dd>${esc(w.temp)}</dd></dl>
+     ${list.length?`<div class="prods"><div class="prods-h">🍷 이런 제품을 찾아보세요 <span>${list.length}개</span></div>${list.map(x=>`<div class="prod"><div class="pn"><b>${esc(x[0])}</b><small>${esc(x[1])}</small></div><div class="pr"><span class="tier t${x[2]}${budget&&x[2]==budget?' fit':''}">${TIER[x[2]]}</span><a href="https://www.google.com/search?q=${encodeURIComponent(x[1]+' wine')}" target="_blank" rel="noopener">검색 ↗</a></div></div>`).join('')}<div class="prods-note">가게마다 없을 수 있고, 빈티지와 가격은 달라요. 영어 이름을 직원에게 보여 주면 찾기 쉬워요.</div></div>`:''}
      <div class="ask">🗣️ 가게에서: "<b>${esc(w.name)}</b> 중에 ${esc(P[w.price[0]])}로 추천해 주세요."</div>
      <button class="btn soft block" data-rec="${w.id}">마셔 봤어요 · 기록하기</button>
    </div></article>`;
@@ -880,7 +926,8 @@ function renderLog(){
 function openSheet(html,onMount){
   closeSheet();
   const s=document.createElement('div');s.className='scrim';s.id='scrim';
-  s.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
+  s.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><div class="sheet-top"><div class="grab"></div><button type="button" class="sheet-x" aria-label="닫기"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>${html}</div>`;
+  s.querySelector('.sheet-x').onclick=closeSheet;
   s.addEventListener('click',e=>{if(e.target===s)closeSheet();});
   document.body.appendChild(s);document.body.style.overflow='hidden';
   onMount&&onMount(s);
@@ -1018,10 +1065,13 @@ function fromHash(){const h=(location.hash||'').slice(1);if(['home','learn','pic
   function leave(){if(done)return;done=true;sp.classList.add('out');const app=$('#app');app.classList.add('enter');
     setTimeout(()=>{sp.remove();app.classList.remove('enter');},850);}
   sp.addEventListener('click',leave);
+  sp.addEventListener('touchend',e=>{e.preventDefault();leave();},{passive:false});
+  setTimeout(leave,reduced?1500:4600);
   sp.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();leave();}});
   try{sp.focus();}catch(e){}
 })();
-fromHash();window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(h!==S.tab&&['home','learn','pick','log'].includes(h)){S.tab=h;render();}});
+S.tab='home';try{if(location.hash)history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(h!==S.tab&&['home','learn','pick','log'].includes(h)){S.tab=h;render();}});
 render();
 })();
 </script>
