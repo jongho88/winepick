@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WinePick</title>
+<meta name="theme-color" content="#6B1E2E">
+<meta name="description" content="와인 초보를 위한 기초 설명, 취향 추천, 마셔 본 와인 기록">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="WinePick">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%236B1E2E'/%3E%3Cpath d='M20 12h24c0 13-4 21-12 21S20 25 20 12z' fill='%23F6E7DA'/%3E%3Cpath d='M21.5 20h21c-1 8-4.5 13-10.5 13s-9.5-5-10.5-13z' fill='%23C2475E'/%3E%3Cpath d='M32 33v13M24 50h16' stroke='%23F6E7DA' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%236B1E2E'/%3E%3Cpath d='M20 12h24c0 13-4 21-12 21S20 25 20 12z' fill='%23F6E7DA'/%3E%3Cpath d='M21.5 20h21c-1 8-4.5 13-10.5 13s-9.5-5-10.5-13z' fill='%23C2475E'/%3E%3Cpath d='M32 33v13M24 50h16' stroke='%23F6E7DA' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --wine:#6B1E2E;--wine2:#8E2C3E;--wine3:#C2475E;--blush:#F6E3E1;
+  --cream:#FBF6F0;--card:#FFFFFF;--ink:#2A1A1D;--muted:#7A6567;--line:#EADDD4;
+  --gold:#B88A3E;--green:#4E7A55;
+  --r:18px;--shadow:0 1px 2px rgba(60,20,30,.06),0 6px 20px rgba(60,20,30,.06);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--cream);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
+  font-size:16px;line-height:1.6;word-break:keep-all}
+button{font:inherit;color:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+#app{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;
+  padding:calc(10px + env(safe-area-inset-top)) 18px 10px;background:rgba(251,246,240,.92);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid transparent}
+.brand{display:flex;align-items:center;gap:8px;color:var(--wine);background:none;border:0;padding:0}
+.brand .script{font-size:32px;line-height:1;margin-top:4px;color:var(--wine)}
+.brand svg{width:28px;height:28px}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center}
+.iconbtn svg{width:20px;height:20px}
+main{flex:1;padding:8px 18px calc(96px + env(safe-area-inset-bottom))}
+.tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:520px;z-index:6;
+  display:grid;grid-template-columns:repeat(4,1fr);background:rgba(255,255,255,.96);border-top:1px solid var(--line);
+  padding:6px 6px calc(6px + env(safe-area-inset-bottom));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.tab{border:0;background:none;padding:6px 0 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;color:var(--muted);border-radius:12px}
+.tab svg{width:24px;height:24px}
+.tab.on{color:var(--wine);font-weight:700}
+h1{font-size:27px;line-height:1.3;letter-spacing:-.03em;margin:14px 0 6px}
+h2{font-size:21px;line-height:1.35;letter-spacing:-.02em;margin:22px 0 10px}
+h3{font-size:17px;margin:0 0 4px;letter-spacing:-.01em}
+p{margin:0 0 10px}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;margin:12px 0}
+.hero{background:linear-gradient(160deg,var(--wine) 0%,#4A1220 100%);color:#FBEFE8;border-radius:24px;padding:24px 20px 22px;margin-top:10px;position:relative;overflow:hidden}
+.hero h1{color:#fff;margin-top:0}
+.hero p{color:#F0D9D2}
+.hero .deco{position:absolute;right:-18px;bottom:-18px;width:130px;opacity:.18}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:14px;padding:14px 18px;font-weight:700;font-size:16px;background:var(--wine);color:#fff;min-height:50px}
+.btn.block{width:100%}
+.btn.light{background:#fff;color:var(--wine)}
+.btn.ghost{background:transparent;color:var(--wine);border:1.5px solid var(--wine)}
+.btn.soft{background:var(--blush);color:var(--wine)}
+.btn.danger{background:#fff;color:#A3273A;border:1.5px solid #E7B7BE}
+.btn:active{transform:scale(.98)}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+.steps{display:grid;gap:10px;margin-top:14px}
+.step{display:flex;align-items:center;gap:14px;background:var(--card);border:0;border-radius:var(--r);box-shadow:var(--shadow);padding:16px;text-align:left;width:100%}
+.step .num{flex:none;width:38px;height:38px;border-radius:12px;background:var(--blush);color:var(--wine);font-weight:800;display:grid;place-items:center}
+.step .arr{margin-left:auto;color:var(--muted)}
+.chip{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--blush);color:var(--wine);font-size:13px;font-weight:600;margin:0 6px 6px 0}
+.chip.gray{background:#F1ECE7;color:var(--muted)}
+/* learn */
+.lcard{background:var(--card);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;margin-top:12px}
+.lart{background:var(--blush);padding:22px 18px;min-height:150px;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
+.lbody{padding:20px 20px 6px}
+.lbody .kicker{font-size:13px;font-weight:700;color:var(--wine3);letter-spacing:.02em}
+.tip{background:#FFF7E8;border-radius:14px;padding:12px 14px;margin:12px 0;font-size:15px}
+.tip b{color:var(--gold)}
+.dots{display:flex;justify-content:center;gap:6px;margin:16px 0}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--wine);width:20px;border-radius:4px}
+.list{margin:6px 0 10px;padding:0;list-style:none}
+.list li{padding:10px 0;border-top:1px solid var(--line)}
+.list li:first-child{border-top:0}
+.glassrow{display:flex;flex-direction:column;align-items:center;font-size:13px;font-weight:600;color:var(--wine)}
+.label{background:#FFFDF8;border:1.5px solid #D9C9B5;border-radius:6px;width:210px;padding:12px 12px 10px;text-align:center;font-family:Georgia,"Times New Roman",serif;position:relative}
+.label .l1{font-size:11px;letter-spacing:.15em;color:#8a7a6a}
+.label .l2{font-size:20px;color:var(--wine);margin:2px 0}
+.label .l3{font-size:13px;color:#4b3b35}
+.label .l4{display:flex;justify-content:space-between;font-size:11px;color:#8a7a6a;margin-top:8px}
+.pin{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--wine3);color:#fff;font:700 11px system-ui;font-style:normal}
+.label .pin{position:absolute}
+/* quiz */
+.progress{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin:14px 0 6px}
+.progress i{display:block;height:100%;background:var(--wine);border-radius:4px;transition:width .3s}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px;margin:10px 0;font-size:16px;font-weight:600}
+.opt .o{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--line)}
+.opt.on{border-color:var(--wine);background:#FFF8F7}
+.opt.on .o{border:7px solid var(--wine)}
+.opt small{display:block;font-weight:400;color:var(--muted);font-size:14px}
+.back{border:0;background:none;color:var(--muted);padding:6px 0;display:inline-flex;gap:4px;align-items:center}
+/* result */
+.profile{background:linear-gradient(160deg,#FFF 0%,var(--blush) 100%);border-radius:24px;padding:20px;box-shadow:var(--shadow);margin-top:12px}
+.nick{font-size:24px;font-weight:800;color:var(--wine);letter-spacing:-.03em;margin:2px 0 10px}
+.taste{display:grid;grid-template-columns:62px 1fr;gap:6px 10px;align-items:center;font-size:14px}
+.bar{display:flex;gap:4px}
+.bar i{flex:1;height:8px;border-radius:4px;background:#EADDD4}
+.bar i.on{background:var(--wine3)}
+.wine{background:var(--card);border-radius:22px;box-shadow:var(--shadow);margin:14px 0;overflow:hidden}
+.whead{display:flex;gap:14px;align-items:center;padding:18px 18px 10px}
+.whead .g{flex:none;width:54px;height:66px;border-radius:14px;background:var(--cream);display:grid;place-items:center}
+.whead .rank{font-size:12px;font-weight:800;color:var(--wine3)}
+.wbody{padding:0 18px 18px}
+.why{background:#FFF8F7;border-left:3px solid var(--wine3);border-radius:0 12px 12px 0;padding:10px 12px;margin:10px 0;font-size:15px}
+.why div{margin:2px 0}
+.kv{display:grid;grid-template-columns:78px 1fr;gap:4px 10px;font-size:15px;margin:10px 0}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+.ask{background:var(--cream);border-radius:12px;padding:10px 12px;font-size:15px;margin:10px 0}
+/* records */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.stat{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:12px;text-align:center}
+.stat b{display:block;font-size:21px;color:var(--wine)}
+.stat span{font-size:12px;color:var(--muted)}
+.rec{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);border:0;border-radius:18px;box-shadow:var(--shadow);padding:14px;margin:10px 0}
+.rec .g{flex:none;width:44px;height:54px;border-radius:12px;background:var(--cream);display:grid;place-items:center}
+.rec .t{flex:1;min-width:0}
+.rec .t b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stars{color:#E0A83B;letter-spacing:1px;font-size:14px}
+.empty{text-align:center;padding:30px 10px;color:var(--muted)}
+.empty svg{width:70px;opacity:.5}
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(30,10,15,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.sheet{background:var(--cream);width:100%;max-width:520px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:10px 18px calc(20px + env(safe-area-inset-bottom));animation:up .25s ease-out}
+.grab{width:40px;height:5px;border-radius:3px;background:#D8C9BF;margin:4px auto 10px}
+@keyframes up{from{transform:translateY(40px);opacity:.5}}
+@keyframes fade{from{opacity:0}}
+.field{margin:14px 0}
+.field label{display:block;font-size:14px;font-weight:700;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:12px;font-size:16px}
+.field textarea{min-height:80px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--wine3)}
+.starpick{display:flex;gap:6px}
+.starpick button{border:0;background:none;font-size:34px;line-height:1;color:#E3D6CC;padding:0 2px}
+.starpick button.on{color:#E0A83B}
+.seg{display:flex;background:#EFE6DE;border-radius:12px;padding:4px}
+.seg button{flex:1;border:0;background:none;border-radius:9px;padding:9px;font-weight:600;color:var(--muted)}
+.seg button.on{background:#fff;color:var(--wine);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+#toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:#2A1A1D;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:30;max-width:90%;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.foot{font-size:12.5px;color:var(--muted);text-align:center;margin:26px 0 6px}
+.sec-title{display:flex;justify-content:space-between;align-items:center}
+.sec-title h2{margin-bottom:6px}
+.link{border:0;background:none;color:var(--wine);font-weight:700;padding:4px}
+.mini{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 10px;margin:0 -2px;scrollbar-width:none}
+.mini::-webkit-scrollbar{display:none}
+.minicard{flex:none;width:150px;background:var(--card);border:0;border-radius:16px;box-shadow:var(--shadow);padding:12px;text-align:left}
+.minicard b{display:block;font-size:14px;line-height:1.35;margin-top:6px}
+/* ---------- 시작 화면 ---------- */
+#splash{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(120% 80% at 50% 30%,#8E2C3E 0%,#5A1626 45%,#2A0911 100%);color:#FBEFE8;overflow:hidden;cursor:pointer;
+  transition:transform .8s cubic-bezier(.7,0,.2,1),opacity .8s ease}
+#splash:focus{outline:none}
+#splash.out{transform:translateY(-100%);opacity:.6}
+#splash .glow{position:absolute;width:420px;height:420px;border-radius:50%;top:50%;left:50%;margin:-280px 0 0 -210px;
+  background:radial-gradient(circle,rgba(255,190,170,.35) 0%,rgba(255,190,170,0) 65%);animation:pulse 2.6s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.15);opacity:.7}}
+#splash .bub{position:absolute;bottom:-20px;border-radius:50%;background:rgba(255,225,210,.55);animation:rise linear infinite}
+@keyframes rise{to{transform:translateY(-110vh) translateX(var(--dx,0));opacity:0}}
+.sp-glass{position:relative;width:150px;height:225px;transform-origin:50% 92%;
+  animation:drop .7s cubic-bezier(.2,1.4,.4,1) both, sway 2.2s ease-in-out .7s infinite}
+@keyframes drop{from{transform:translateY(-60px) scale(.6);opacity:0}}
+@keyframes sway{0%,100%{transform:rotate(0)}25%{transform:rotate(-9deg)}75%{transform:rotate(9deg)}}
+.sp-glass svg{width:100%;height:100%;overflow:visible}
+.sp-fill{animation:fill 1.6s cubic-bezier(.4,0,.2,1) .5s both}
+@keyframes fill{from{transform:translateY(108px)}to{transform:translateY(42px)}}
+.sp-wave{animation:wave 1.1s linear infinite}
+.sp-wave2{animation:wave 1.7s linear infinite reverse;opacity:.55}
+@keyframes wave{from{transform:translateX(-60px)}to{transform:translateX(0)}}
+.sp-pour{stroke-dasharray:120;stroke-dashoffset:120;animation:pour 1.7s ease .35s both}
+@keyframes pour{25%{stroke-dashoffset:0;opacity:1}75%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:-120;opacity:0}}
+.sp-spark{transform-origin:center;transform-box:fill-box;animation:spark 1.8s ease-in-out infinite;opacity:0}
+@keyframes spark{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1)}}
+.script{font-family:"Great Vibes","Snell Roundhand","Apple Chancery","Segoe Script",cursive;font-weight:400;letter-spacing:0}
+.sp-titlewrap{position:relative;margin-top:14px;display:flex;flex-direction:column;align-items:center}
+.sp-title{font-size:84px;line-height:1.15;padding:0 18px;
+  background:linear-gradient(100deg,#FFF3E6 0%,#F9CFC4 35%,#E9BC6E 48%,#FFF6E8 52%,#F9CFC4 65%,#FFF3E6 100%);background-size:260% 100%;background-position:100% 0;
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 4px 18px rgba(255,170,150,.35));
+  clip-path:inset(-20% 100% -20% 0);animation:write 1.6s cubic-bezier(.45,.1,.3,1) 1.1s forwards, shimmer 3.2s ease-in-out 2.9s infinite}
+@keyframes write{to{clip-path:inset(-20% -5% -20% 0)}}
+@keyframes shimmer{0%{background-position:100% 0}60%,100%{background-position:0 0}}
+.sp-flourish{width:230px;height:26px;margin-top:-10px;overflow:visible}
+.sp-flourish path{stroke-dasharray:300;stroke-dashoffset:300;animation:draw 1.1s ease-out 2.4s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.sp-tag{margin-top:6px;font-size:16px;color:#F0D2CA;opacity:0;animation:tag .8s ease 2.7s forwards;letter-spacing:.02em}
+@keyframes tag{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sp-skip{position:absolute;bottom:calc(48px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:10px;
+  padding:12px 22px;border-radius:999px;border:1.5px solid rgba(255,220,210,.45);background:rgba(255,255,255,.08);
+  font-size:16px;font-weight:700;color:#FFE9E2;opacity:0;animation:tag .7s ease 3.1s forwards, breathe 1.8s ease-in-out 3.8s infinite}
+@keyframes breathe{50%{transform:scale(1.05);background:rgba(255,255,255,.16)}}
+.tapdot{width:10px;height:10px;border-radius:50%;background:#F7B9B0;box-shadow:0 0 0 0 rgba(247,185,176,.7);animation:ping 1.8s ease-out infinite}
+@keyframes ping{to{box-shadow:0 0 0 12px rgba(247,185,176,0)}}
+.sp-bar{position:absolute;bottom:calc(60px + env(safe-area-inset-bottom));width:120px;height:3px;border-radius:2px;background:rgba(255,255,255,.15);overflow:hidden}
+.sp-bar i{display:block;height:100%;width:100%;background:#F7B9B0;transform-origin:left;animation:prog 3.4s linear both}
+@keyframes prog{from{transform:scaleX(0)}}
+#app.enter{animation:enter .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes enter{from{opacity:0;transform:translateY(30px) scale(.98)}}
+@media (prefers-reduced-motion:reduce){
+  .sp-glass,.sp-fill,.sp-wave,.sp-wave2,.sp-title,.sp-flourish path,.sp-tag,.sp-pour,#splash .bub,#splash .glow,.sp-bar i{animation-duration:.01s!important;animation-delay:0s!important;animation-iteration-count:1!important}
+}
+</style>
+</head>
+<body>
+<div id="splash" role="button" tabindex="0" aria-label="WinePick 시작 화면. 눌러서 시작하기">
+  <div class="glow"></div>
+  <div class="sp-glass">
+    <svg viewBox="0 0 120 180" aria-hidden="true">
+      <defs>
+        <clipPath id="bowlClip"><path d="M22 14H98C98 72 84 104 60 104S22 72 22 14Z"/></clipPath>
+        <linearGradient id="wineG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D9475F"/><stop offset=".5" stop-color="#9E2338"/><stop offset="1" stop-color="#5E0F1F"/></linearGradient>
+      </defs>
+      <g clip-path="url(#bowlClip)">
+        <rect x="0" y="0" width="120" height="110" fill="rgba(255,255,255,.08)"/>
+        <g class="sp-fill">
+          <g class="sp-wave2"><path d="M-120 2Q-105 -4 -90 2T-60 2T-30 2T0 2T30 2T60 2T90 2T120 2T150 2T180 2T210 2T240 2V120H-120Z" fill="#E66A7E"/></g>
+          <g class="sp-wave"><path d="M-120 4Q-105 -3 -90 4T-60 4T-30 4T0 4T30 4T60 4T90 4T120 4T150 4T180 4T210 4T240 4V120H-120Z" fill="url(#wineG)"/></g>
+        </g>
+      </g>
+      <path d="M22 14H98C98 72 84 104 60 104S22 72 22 14Z" fill="none" stroke="rgba(255,240,235,.85)" stroke-width="2.5"/>
+      <path d="M33 24C32 50 38 74 50 88" stroke="rgba(255,255,255,.55)" stroke-width="4" stroke-linecap="round" fill="none"/>
+      <path d="M60 104V160" stroke="rgba(255,240,235,.85)" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="60" cy="164" rx="28" ry="5.5" fill="none" stroke="rgba(255,240,235,.85)" stroke-width="3"/>
+      <path class="sp-spark" style="animation-delay:1.6s" d="M104 22l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5z" fill="#FFE3C8"/>
+      <path class="sp-spark" style="animation-delay:2.1s" d="M14 60l2 4.5 4.5 2-4.5 2-2 4.5-2-4.5-4.5-2 4.5-2z" fill="#FFE3C8"/>
+      <path class="sp-spark" style="animation-delay:2.6s" d="M100 92l1.6 3.6 3.6 1.6-3.6 1.6-1.6 3.6-1.6-3.6-3.6-1.6 3.6-1.6z" fill="#FFE3C8"/>
+    </svg>
+  </div>
+  <div class="sp-titlewrap" aria-hidden="true">
+    <div class="sp-title script">WinePick</div>
+    <svg class="sp-flourish" viewBox="0 0 230 26"><path d="M10 14C50 22 90 4 120 12S175 24 220 8" fill="none" stroke="#E9BC6E" stroke-width="1.6" stroke-linecap="round"/><circle cx="220" cy="8" r="2.4" fill="#E9BC6E" style="opacity:0;animation:tag .3s ease 3.4s forwards"/></svg>
+  </div>
+  <div class="sp-tag">내 입맛에 꼭 맞는 와인 찾기</div>
+  <div class="sp-skip"><span class="tapdot"></span>화면을 눌러 시작하기</div>
+</div>
+<div id="app">
+  <header class="top">
+    <button class="brand" data-go="home" aria-label="홈으로">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#6B1E2E"/><path d="M20 12h24c0 13-4 21-12 21S20 25 20 12z" fill="#F6E7DA"/><path d="M21.5 20h21c-1 8-4.5 13-10.5 13s-9.5-5-10.5-13z" fill="#C2475E"/><path d="M32 33v13M24 50h16" stroke="#F6E7DA" stroke-width="3.5" stroke-linecap="round"/></svg>
+      <span class="script">WinePick</span>
+    </button>
+    <button class="iconbtn" id="settingsBtn" aria-label="설정">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#6B1E2E" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </header>
+  <main id="view"></main>
+  <nav class="tabs" id="tabs">
+    <button class="tab" data-go="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>홈</button>
+    <button class="tab" data-go="learn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M9 8h6M9 12h6"/></svg>배우기</button>
+    <button class="tab" data-go="pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10c0 6-2 9-5 9s-5-3-5-9zM12 12v6M8 21h8"/></svg>추천받기</button>
+    <button class="tab" data-go="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>내 기록</button>
+  </nav>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- 저장소 (사용할 수 없을 때는 메모리에 보관) ---------- */
+const mem={};
+const store={
+  get(k,d){try{const v=localStorage.getItem('winepick_'+k);if(v!=null)return JSON.parse(v);}catch(e){}return (k in mem)?mem[k]:d;},
+  set(k,v){mem[k]=v;try{localStorage.setItem('winepick_'+k,JSON.stringify(v));}catch(e){}}
+};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=s=>document.querySelector(s);
+const view=$('#view');
+
+function defaultCurrency(){
+  try{const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'';if(tz==='Asia/Seoul')return 'KRW';}catch(e){}
+  try{if((navigator.language||'').toLowerCase()==='ko-kr')return 'KRW';}catch(e){}
+  return 'USD';
+}
+let settings=store.get('settings',null)||{currency:defaultCurrency()};
+
+/* ---------- 데이터 ---------- */
+const TYPES={
+  red:{label:'레드',color:'#8E2C3E'},
+  white:{label:'화이트',color:'#E4CF72'},
+  rose:{label:'로제',color:'#EE95A2'},
+  sparkling:{label:'스파클링',color:'#E9D37E'},
+  dessert:{label:'디저트',color:'#A8572A'}
+};
+const PRICE={
+  KRW:{1:'2만 원 이하',2:'2~5만 원',3:'5만 원 이상'},
+  USD:{1:'$15 이하',2:'$15~30',3:'$30 이상'}
+};
+const FOOD={meat:'고기 (스테이크·삼겹살·갈비)',seafood:'해산물·회·생선',chicken:'치킨·닭요리',pizza:'피자·파스타',spicy:'매운 음식 (떡볶이·마라·타코)',cheese:'치즈·간단한 안주',dessert:'디저트·케이크',none:'음식 없이 와인만'};
+const FOODSHORT={meat:'고기 요리',seafood:'해산물',chicken:'닭요리',pizza:'피자·파스타',spicy:'매운 음식',cheese:'치즈·안주',dessert:'디저트'};
+const OCC={alone:'혼자 편하게',date:'데이트·둘이서',party:'친구들과 모임',gift:'선물하기'};
+const OCCWHY={alone:'혼자 부담 없이 마시기 좋아요',date:'분위기 내기 좋은 와인이에요',party:'여럿이 나눠 마시기 좋아요',gift:'선물로 주면 반가워할 와인이에요'};
+
+// s 단맛, a 신맛, t 떫은맛(탄닌), b 바디감 (0~5)
+const WINES=[
+ {id:'cab-chile',name:'칠레 카베르네 소비뇽',type:'red',grape:'카베르네 소비뇽',s:1,a:3,t:4,b:4,price:[1,2],food:['meat','cheese'],occ:['alone','party'],aroma:'블랙베리, 체리, 살짝 초콜릿',desc:'진하고 묵직한 레드의 대표예요. 칠레산은 값에 비해 맛이 좋아서 처음 고르기 좋아요.',temp:'16~18°C',ex:'카시예로 델 디아블로(Casillero del Diablo)'},
+ {id:'cab-cal',name:'캘리포니아 카베르네 소비뇽',type:'red',grape:'카베르네 소비뇽',s:1,a:3,t:4,b:5,price:[2,3],food:['meat','cheese'],occ:['gift','date'],aroma:'잘 익은 블랙베리, 바닐라, 오크 향',desc:'과일 맛이 풍부하고 아주 묵직해요. 스테이크와 함께라면 실패가 거의 없어요.',temp:'16~18°C',ex:'조쉬 셀러(Josh Cellars), 켄달 잭슨(Kendall-Jackson)'},
+ {id:'pinot',name:'피노 누아',type:'red',grape:'피노 누아',s:1,a:4,t:2,b:2,price:[2,3],food:['chicken','seafood','pizza','cheese'],occ:['date','gift'],aroma:'딸기, 체리, 버섯, 흙 내음',desc:'떫은맛이 적고 가벼운 레드예요. 레드가 처음이라면 가장 편하게 시작할 수 있어요. 연어와도 잘 맞아요.',temp:'13~15°C',ex:'미국 오리건이나 캘리포니아산, 프랑스 부르고뉴(Bourgogne)산'},
+ {id:'merlot',name:'메를로',type:'red',grape:'메를로',s:1,a:3,t:3,b:3,price:[1,2],food:['pizza','chicken','meat'],occ:['alone','party'],aroma:'자두, 체리, 부드러운 초콜릿',desc:'카베르네보다 부드럽고 둥근 맛이에요. 누구나 무난하게 좋아하는 레드예요.',temp:'15~17°C',ex:'칠레나 미국 캘리포니아산'},
+ {id:'malbec',name:'아르헨티나 말벡',type:'red',grape:'말벡',s:1,a:3,t:4,b:4,price:[1,2],food:['meat'],occ:['party','alone'],aroma:'자두, 블루베리, 제비꽃',desc:'진하지만 부드러워서 고기, 특히 바비큐와 찰떡이에요. 가성비가 좋아요.',temp:'16~18°C',ex:'카테나(Catena), 알라모스(Alamos)'},
+ {id:'shiraz',name:'호주 쉬라즈',type:'red',grape:'쉬라즈(시라)',s:2,a:3,t:4,b:5,price:[1,2],food:['meat','pizza'],occ:['party'],aroma:'블랙베리 잼, 후추, 스모키',desc:'과일 잼처럼 진하고 살짝 후추 향이 나요. 양념 갈비, 바비큐에 잘 어울려요.',temp:'16~18°C',ex:'옐로우 테일(Yellow Tail), 펜폴즈(Penfolds)'},
+ {id:'chianti',name:'이탈리아 키안티',type:'red',grape:'산지오베제',s:1,a:4,t:3,b:3,price:[1,2],food:['pizza','meat','cheese'],occ:['party','date'],aroma:'체리, 토마토 잎, 허브',desc:'산미가 살아 있어서 토마토 소스와 아주 잘 맞아요. 피자·파스타 와인의 정석이에요.',temp:'15~17°C',ex:'라벨에 Chianti 또는 Chianti Classico 표시'},
+ {id:'rioja',name:'스페인 리오하',type:'red',grape:'템프라니요',s:1,a:3,t:3,b:4,price:[2,3],food:['meat','cheese'],occ:['gift','party'],aroma:'체리, 바닐라, 가죽',desc:'오크통에서 숙성해 부드럽고 은은한 바닐라 향이 나요. 라벨의 Crianza·Reserva는 숙성 기간이에요.',temp:'16~18°C',ex:'캄포 비에호(Campo Viejo), 마르케스 데 리스칼(Marqués de Riscal)'},
+ {id:'zin',name:'캘리포니아 진판델',type:'red',grape:'진판델',s:2,a:3,t:3,b:4,price:[1,2],food:['pizza','meat','spicy'],occ:['party','alone'],aroma:'라즈베리 잼, 블랙베리, 향신료',desc:'과일 맛이 진하고 살짝 달게 느껴져요. 바비큐, 버거, 피자 같은 편한 음식과 좋아요.',temp:'15~17°C',ex:'라벨에 Zinfandel 표시 (분홍색 White Zinfandel과는 달라요)'},
+ {id:'sb-nz',name:'뉴질랜드 소비뇽 블랑',type:'white',grape:'소비뇽 블랑',s:1,a:5,t:0,b:2,price:[1,2],food:['seafood','chicken','cheese','none'],occ:['alone','party'],aroma:'자몽, 라임, 풋풋한 풀 향, 패션프루트',desc:'아주 상큼하고 향이 톡 쏘는 화이트예요. 회, 샐러드, 해산물과 잘 맞아요.',temp:'7~10°C',ex:'킴 크로포드(Kim Crawford), 빌라 마리아(Villa Maria)'},
+ {id:'chard-cal',name:'캘리포니아 샤르도네',type:'white',grape:'샤르도네',s:1,a:3,t:0,b:4,price:[2],food:['chicken','seafood','pizza'],occ:['date','alone'],aroma:'사과, 파인애플, 버터, 바닐라',desc:'오크통 숙성으로 버터처럼 부드럽고 묵직한 화이트예요. 크림 파스타, 구운 닭에 좋아요.',temp:'10~12°C',ex:'켄달 잭슨(Kendall-Jackson), 라 크레마(La Crema)'},
+ {id:'chablis',name:'프랑스 샤블리',type:'white',grape:'샤르도네',s:1,a:4,t:0,b:2,price:[2,3],food:['seafood'],occ:['gift','date'],aroma:'청사과, 레몬, 미네랄(돌) 느낌',desc:'같은 샤르도네지만 깔끔하고 상큼해요. 굴, 회, 조개 요리와 최고의 짝이에요.',temp:'8~10°C',ex:'라벨에 Chablis 표시'},
+ {id:'riesling',name:'독일 리슬링',type:'white',grape:'리슬링',s:3,a:5,t:0,b:2,price:[1,2],food:['spicy','chicken','seafood'],occ:['alone','date'],aroma:'복숭아, 살구, 라임, 꽃',desc:'살짝 달콤하고 아주 상큼해요. 매운 음식의 열기를 식혀 줘서 떡볶이, 태국·중국 요리와 좋아요.',temp:'7~10°C',ex:'라벨에 Kabinett(살짝 단맛) 표시, 닥터 루젠(Dr. Loosen)'},
+ {id:'pg',name:'이탈리아 피노 그리지오',type:'white',grape:'피노 그리지오',s:1,a:3,t:0,b:1,price:[1],food:['seafood','chicken','none'],occ:['alone','party'],aroma:'레몬, 배, 청사과',desc:'가볍고 깔끔해서 물처럼 술술 넘어가요. 와인이 낯선 사람에게 부담 없는 화이트예요.',temp:'7~10°C',ex:'산타 마르게리타(Santa Margherita), 에코 도마니(Ecco Domani)'},
+ {id:'rose',name:'프로방스 로제',type:'rose',grape:'그르나슈·생소 블렌드',s:1,a:4,t:1,b:2,price:[2],food:['seafood','chicken','cheese','none','spicy'],occ:['party','date','alone'],aroma:'딸기, 수박, 복숭아, 꽃',desc:'연한 분홍빛에 달지 않고 상큼해요. 거의 모든 음식과 어울려서 고민될 때 좋아요.',temp:'8~10°C',ex:'위스퍼링 엔젤(Whispering Angel), 라벨에 Côtes de Provence 표시'},
+ {id:'prosecco',name:'이탈리아 프로세코',type:'sparkling',grape:'글레라',s:2,a:4,t:0,b:1,price:[1],food:['none','chicken','cheese','seafood'],occ:['party','alone'],aroma:'청사과, 배, 꽃',desc:'가볍고 상큼한 거품 와인이에요. 샴페인보다 값이 착해서 파티나 건배용으로 딱이에요.',temp:'6~8°C',ex:'라 마르카(La Marca), 미오네토(Mionetto). Brut는 덜 달고 Extra Dry는 살짝 달아요'},
+ {id:'cava',name:'스페인 카바',type:'sparkling',grape:'마카베오 외',s:1,a:4,t:0,b:2,price:[1],food:['chicken','seafood','none'],occ:['party'],aroma:'레몬, 사과, 토스트',desc:'샴페인과 같은 방식으로 만든 가성비 스파클링이에요. 치킨이나 튀김과 정말 잘 맞아요.',temp:'6~8°C',ex:'프레시넷(Freixenet)'},
+ {id:'champagne',name:'프랑스 샴페인',type:'sparkling',grape:'샤르도네·피노 누아',s:1,a:5,t:0,b:3,price:[3],food:['seafood','chicken','none'],occ:['gift','date','party'],aroma:'레몬, 사과, 갓 구운 빵, 견과',desc:'프랑스 샹파뉴 지역에서만 만드는 스파클링이에요. 축하하는 날, 선물로 가장 확실해요.',temp:'7~9°C',ex:'모엣 샹동(Moët & Chandon), 뵈브 클리코(Veuve Clicquot)'},
+ {id:'moscato',name:'모스카토 다스티',type:'sparkling',grape:'모스카토',s:5,a:3,t:0,b:1,price:[1],food:['dessert','spicy','none'],occ:['alone','date'],aroma:'복숭아, 청포도, 꿀, 꽃',desc:'달콤하고 살짝 톡 쏘는 와인이에요. 도수가 5% 정도로 낮아서 술이 약한 사람도 즐기기 좋아요.',temp:'6~8°C',ex:"라벨에 Moscato d'Asti 표시"},
+ {id:'brachetto',name:'브라케토 다퀴',type:'sparkling',grape:'브라케토',s:4,a:3,t:1,b:1,price:[1,2],food:['dessert','none'],occ:['date','party'],aroma:'딸기, 장미, 라즈베리',desc:'붉은빛의 달콤한 거품 와인이에요. 초콜릿, 딸기 케이크와 함께하면 분위기가 살아나요.',temp:'6~8°C',ex:"라벨에 Brachetto d'Acqui 표시"},
+ {id:'port',name:'포트 와인',type:'dessert',grape:'포르투갈 토착 품종',s:5,a:2,t:3,b:5,price:[2,3],food:['dessert','cheese'],occ:['gift','alone'],aroma:'건포도, 캐러멜, 초콜릿, 견과',desc:'달고 진하며 도수가 20% 정도로 높아요. 작은 잔에 조금씩, 초콜릿이나 블루치즈와 마셔요. 열고 나서도 몇 주 보관돼요.',temp:'14~16°C',ex:"그레이엄스(Graham's), 테일러스(Taylor's)"}
+];
+const WMAP=Object.fromEntries(WINES.map(w=>[w.id,w]));
+
+const QUIZ=[
+ {id:'coffee',q:'커피는 보통 어떻게 마셔요?',hint:'단맛과 떫은맛 취향을 알아봐요',opts:[['black','아메리카노·블랙커피'],['latte','라떼처럼 부드럽게'],['sweet','달달한 커피·믹스커피'],['no','커피는 잘 안 마셔요']]},
+ {id:'sour',q:'레몬이나 자몽 같은 상큼한 맛, 어때요?',hint:'신맛(산미) 취향이에요',opts:[['love','아주 좋아요'],['ok','적당하면 좋아요'],['no','신 건 별로예요']]},
+ {id:'body',q:'어떤 느낌을 더 좋아해요?',hint:'와인의 무게감(바디감)이에요',opts:[['heavy','진하게','다크초콜릿, 진하게 우린 홍차'],['mid','중간','우유처럼 부드럽게'],['light','가볍게','탄산수처럼 깔끔하게']]},
+ {id:'type',q:'끌리는 와인 종류가 있어요?',hint:'잘 모르면 "아직 모르겠어요"를 고르세요',opts:[['any','아직 모르겠어요'],['red','레드'],['white','화이트'],['rose','로제'],['sparkling','스파클링 (거품)']]},
+ {id:'food',q:'무엇과 함께 마실 거예요?',hint:'음식에 맞추면 와인이 더 맛있어져요',opts:Object.entries(FOOD)},
+ {id:'occ',q:'어떤 자리예요?',opts:Object.entries(OCC)},
+ {id:'budget',q:'예산은 한 병에 어느 정도예요?',opts:null}
+];
+function budgetOpts(){const P=PRICE[settings.currency];return [['1','부담 없이',P[1]],['2','적당히',P[2]],['3','특별한 날',P[3]],['0','상관없어요']];}
+
+/* ---------- 그림 ---------- */
+function glass(type,w){
+  w=w||34;const c=(TYPES[type]||TYPES.red).color;
+  const bub=type==='sparkling'?'<circle cx="14" cy="17" r="1.3" fill="#fff" opacity=".9"/><circle cx="18" cy="13.5" r="1" fill="#fff" opacity=".9"/><circle cx="16" cy="20" r="0.9" fill="#fff" opacity=".9"/>':'';
+  if(type==='sparkling'){
+    return `<svg width="${w*0.75}" height="${w*1.3}" viewBox="0 0 24 42" aria-hidden="true"><path d="M7 2h10l-1 20c-.3 3-2 4.5-4 4.5S8.3 25 8 22z" fill="#fff" stroke="#CDB9AE" stroke-width="1"/><path d="M7.6 9h8.8l-.7 13c-.3 2.5-1.7 3.6-3.7 3.6S8.6 24.5 8.3 22z" fill="${c}"/>${bub}<path d="M12 26.5V38M7.5 40h9" stroke="#CDB9AE" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+  }
+  return `<svg width="${w}" height="${w*1.2}" viewBox="0 0 34 41" aria-hidden="true"><path d="M5 2h24c0 13-4 21-12 21S5 15 5 2z" fill="#fff" stroke="#CDB9AE" stroke-width="1"/><path d="M6.2 10h21.6c-1 8-4.7 13-10.8 13S7.2 18 6.2 10z" fill="${c}"/><path d="M17 23v13M11 39h12" stroke="#CDB9AE" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+}
+function bar(n){let h='';for(let i=1;i<=5;i++)h+=`<i class="${i<=Math.round(n)?'on':''}"></i>`;return `<div class="bar">${h}</div>`;}
+function tasteBlock(o,isWine){
+  const rows=[['단맛',o.s],['신맛',o.a],['떫은맛',o.t],['바디감',o.b]];
+  return `<div class="taste">${rows.map(([k,v])=>`<span>${k}</span>${bar(v)}`).join('')}</div>`;
+}
+function stars(n){return '★★★★★'.slice(0,n)+'<span style="color:#E3D6CC">'+'★★★★★'.slice(0,5-n)+'</span>';}
+const chev='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>';
+
+/* ---------- 배우기 카드 ---------- */
+const LEARN=[
+ {k:'1. 와인의 종류',t:'와인은 크게 네 가지예요',art:()=>['red','white','rose','sparkling'].map(t=>`<div class="glassrow">${glass(t,44)}<span>${TYPES[t].label}</span></div>`).join(''),
+  b:`<ul class="list">
+  <li><b>레드</b> — 포도 껍질째 발효해서 색과 떫은맛이 생겨요. 실온보다 살짝 시원하게 마셔요.</li>
+  <li><b>화이트</b> — 껍질을 빼고 즙만 발효해요. 상큼하고 가벼운 편이고 차갑게 마셔요.</li>
+  <li><b>로제</b> — 껍질을 잠깐만 담가 분홍빛이 돌아요. 레드와 화이트의 중간이에요.</li>
+  <li><b>스파클링</b> — 거품이 있는 와인이에요. 샴페인, 프로세코, 카바가 여기 속해요.</li></ul>`,
+  tip:'디저트처럼 달고 진한 <b>디저트 와인</b>(포트 와인 등)도 있어요. 작은 잔에 조금씩 마셔요.'},
+ {k:'2. 맛 표현',t:'와인 맛을 말하는 다섯 단어',art:()=>['단맛','신맛','떫은맛','바디감','향'].map((w,i)=>`<span class="chip" style="font-size:15px;padding:6px 14px;background:#fff">${w}</span>`).join(''),
+  b:`<ul class="list">
+  <li><b>단맛</b> — 달지 않은 와인을 <b>드라이(Dry)</b>라고 해요. '건조하다'가 아니라 '안 달다'라는 뜻이에요.</li>
+  <li><b>신맛(산미)</b> — 침이 고이는 상큼함이에요. 산미가 있어야 맛이 생생해요.</li>
+  <li><b>떫은맛(탄닌)</b> — 진하게 우린 홍차를 마신 뒤 입안이 텁텁한 느낌이에요. 주로 레드에 있어요.</li>
+  <li><b>바디감</b> — 입안에서 느끼는 무게예요. 가벼우면 물, 무거우면 우유 같아요.</li>
+  <li><b>향</b> — 과일, 꽃, 나무, 빵 같은 향이 나요. 잔을 살살 돌리면 향이 더 올라와요.</li></ul>`,
+  tip:'처음엔 "달다/안 달다", "가볍다/진하다" 두 가지만 기억해도 충분해요.'},
+ {k:'3. 포도 품종',t:'꼭 알아 둘 품종 6가지',art:()=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%">${[['red','카베르네 소비뇽'],['red','피노 누아'],['red','메를로'],['white','샤르도네'],['white','소비뇽 블랑'],['white','리슬링']].map(([t,n])=>`<div style="display:flex;align-items:center;gap:6px;background:#fff;border-radius:12px;padding:6px 10px;font-size:14px;font-weight:600">${glass(t,20)}${n}</div>`).join('')}</div>`,
+  b:`<ul class="list">
+  <li><b>카베르네 소비뇽</b> (레드) — 진하고 떫은 맛. 스테이크와 최고예요.</li>
+  <li><b>피노 누아</b> (레드) — 가볍고 부드러워요. 레드 입문용으로 좋아요.</li>
+  <li><b>메를로</b> (레드) — 둥글고 부드러운 맛. 누구나 무난하게 좋아해요.</li>
+  <li><b>샤르도네</b> (화이트) — 깔끔한 맛부터 버터처럼 진한 맛까지 다양해요.</li>
+  <li><b>소비뇽 블랑</b> (화이트) — 자몽처럼 상큼하고 향이 톡 쏴요.</li>
+  <li><b>리슬링</b> (화이트) — 꽃향기에 상큼하고, 살짝 단 것도 많아요.</li></ul>`,
+  tip:'마셔 보고 좋았던 와인의 <b>품종</b>을 기억해 두면, 다음에 고르기가 훨씬 쉬워져요.'},
+ {k:'4. 라벨 읽기',t:'라벨에서 이것만 보세요',art:()=>`<div class="label"><i class="pin" style="left:-10px;top:8px">1</i><i class="pin" style="right:-10px;top:36px">2</i><i class="pin" style="left:-10px;bottom:6px">3</i><i class="pin" style="right:-10px;bottom:6px">4</i>
+   <div class="l1">NAPA VALLEY · CALIFORNIA</div><div class="l2">Sample Cellars</div><div class="l3">Cabernet Sauvignon</div><div class="l4"><span>2021</span><span>14.5% vol</span></div></div>`,
+  b:`<ul class="list">
+  <li><span class="pin">1</span> <b>나라·지역</b> — 어디서 만들었는지 알려 줘요.</li>
+  <li><span class="pin">2</span> <b>품종</b> — 미국, 칠레, 호주 와인은 보통 품종을 크게 적어요.</li>
+  <li><span class="pin">3</span> <b>빈티지</b> — 포도를 수확한 해예요. 데일리 와인은 최근 연도면 충분해요.</li>
+  <li><span class="pin">4</span> <b>알코올 도수</b> — 높을수록(14% 이상) 진하고 묵직한 편이에요.</li></ul>`,
+  tip:'프랑스·이탈리아 와인은 품종 대신 <b>지역 이름</b>을 적어요. 예를 들어 <b>샤블리</b>는 샤르도네, <b>키안티</b>는 산지오베제로 만들어요.'},
+ {k:'5. 음식 짝꿍',t:'음식과 맞추는 기본 규칙',art:()=>[['red','고기'],['white','생선'],['sparkling','튀김'],['rose','뭐든']].map(([t,f])=>`<div class="glassrow">${glass(t,34)}<span>${f}</span></div>`).join(''),
+  b:`<ul class="list">
+  <li><b>무게를 맞춰요</b> — 진한 음식엔 진한 와인, 가벼운 음식엔 가벼운 와인.</li>
+  <li><b>기름진 음식엔 상큼한 와인</b> — 산미와 거품이 입안을 개운하게 해 줘요. 치킨에 스파클링이 잘 맞는 이유예요.</li>
+  <li><b>매운 음식엔 살짝 단 와인</b> — 단맛이 매운맛을 달래요. 떫고 도수 높은 레드는 더 맵게 느껴져요.</li>
+  <li><b>디저트엔 더 단 와인</b> — 와인이 디저트보다 달아야 와인이 시큼해지지 않아요.</li>
+  <li><b>생선엔 화이트</b> — 떫은 레드와 생선을 같이 먹으면 비린 맛이 날 수 있어요.</li></ul>`,
+  tip:'헷갈리면 <b>로제나 스파클링</b>을 고르세요. 거의 모든 음식과 잘 어울려요.'},
+ {k:'6. 맛있게 마시기',t:'온도만 맞춰도 맛이 달라져요',art:()=>`<div style="width:100%;display:grid;gap:6px;font-size:14px">${[['sparkling','스파클링·달콤한 와인','6~8°C','냉장고에서 바로'],['white','화이트·로제','8~12°C','냉장고에서 꺼내 10분'],['red','가벼운 레드','13~15°C','냉장고에 20분'],['red','진한 레드','16~18°C','냉장고에 10~15분']].map(([t,n,c,h])=>`<div style="display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:6px 10px">${glass(t,18)}<b style="flex:1">${n}</b><span style="color:var(--wine);font-weight:700">${c}</span></div>`).join('')}</div>`,
+  b:`<ul class="list">
+  <li><b>레드도 살짝 시원하게</b> — 너무 따뜻하면 알코올 맛이 강해져요. 냉장고에 15분쯤 넣었다 마시면 좋아요.</li>
+  <li><b>화이트는 너무 차갑지 않게</b> — 꽁꽁 차가우면 향이 잘 안 느껴져요.</li>
+  <li><b>잔은 1/3만</b> — 공간이 있어야 잔을 돌려 향을 맡을 수 있어요.</li>
+  <li><b>남은 와인</b> — 마개를 막아 냉장고에 두면 3~5일, 스파클링은 1~2일 괜찮아요.</li></ul>`,
+  tip:'이제 기초는 끝! 내 취향에 맞는 와인을 찾아볼까요?'}
+];
+
+/* ---------- 상태 ---------- */
+const S={tab:'home',learn:0,quiz:null};
+
+/* ---------- 추천 계산 ---------- */
+function targetOf(ans){
+  let s=2,a=3,t=3,b=3;
+  if(ans.coffee==='black'){s=1;t=3.5}
+  else if(ans.coffee==='latte'){s=2;t=2.5}
+  else if(ans.coffee==='sweet'){s=4;t=2}
+  a={love:4.5,ok:3.2,no:2}[ans.sour]||3;
+  if(ans.body==='heavy'){b=4.5;t=Math.max(t,4)}
+  else if(ans.body==='light'){b=1.5;t=Math.min(t,1.5)}
+  return {s,a,t,b};
+}
+function recommend(ans){
+  const T=targetOf(ans);
+  const recs=store.get('records',[]);
+  const liked=recs.filter(r=>r.style&&WMAP[r.style]&&r.rating>=4).map(r=>r.style);
+  const disliked=recs.filter(r=>r.style&&WMAP[r.style]&&r.rating<=2).map(r=>r.style);
+  const budget=+ans.budget||0;
+  const scored=WINES.map(w=>{
+    let d=Math.abs(w.s-T.s)*1.3+Math.abs(w.a-T.a)+Math.abs(w.b-T.b);
+    d+= w.t>T.t ? (w.t-T.t)*0.9 : (T.t-w.t)*0.35;
+    let sc=10-d;const why=[];
+    // 종류
+    if(ans.type&&ans.type!=='any'){ if(w.type===ans.type) sc+=3.5; else sc-=5; }
+    // 음식
+    if(ans.food&&ans.food!=='none'){
+      if(w.food.includes(ans.food)){sc+=3;why.push(`${FOODSHORT[ans.food]}에 잘 어울려요`);}
+      else sc-=1.5;
+      if(ans.food==='dessert'&&w.s<3) sc-=4;
+      if(ans.food==='spicy'&&w.t>=4) sc-=2;
+      if(ans.food==='seafood'&&w.type==='red'&&w.t>=3) sc-=2;
+    }else if(ans.food==='none'&&w.food.includes('none')){sc+=1;why.push('음식 없이 그냥 마셔도 맛있어요');}
+    // 자리
+    if(ans.occ&&w.occ.includes(ans.occ)){sc+=1.5;why.push(OCCWHY[ans.occ]);}
+    // 예산
+    if(budget){ if(w.price.includes(budget)) sc+=1.5; else sc-=2.5; }
+    // 기록
+    if(liked.includes(w.id)){sc+=2.5;why.unshift('전에 마시고 좋았다고 기록한 스타일이에요');}
+    else if(liked.some(id=>{const l=WMAP[id];return l.grape===w.grape||(l.type===w.type&&Math.abs(l.s-w.s)+Math.abs(l.a-w.a)+Math.abs(l.b-w.b)<=2);})){sc+=1;why.push('전에 좋았던 와인과 비슷한 스타일이에요');}
+    if(disliked.includes(w.id)) sc-=4;
+    // 맛 설명
+    const tw=[];
+    if(T.s<=1.5&&w.s<=1) tw.push('달지 않은 맛을 좋아하셔서 드라이한 와인으로 골랐어요');
+    if(T.s>=3.5&&w.s>=3) tw.push('달콤한 맛을 좋아하셔서 단맛이 있는 와인이에요');
+    if(T.a>=4&&w.a>=4) tw.push('상큼한 맛을 좋아하셔서 산미가 살아 있어요');
+    if(T.a<=2.2&&w.a<=3) tw.push('신맛이 강하지 않아 편하게 마실 수 있어요');
+    if(T.b>=4&&w.b>=4) tw.push('진한 맛을 좋아하셔서 묵직한 와인이에요');
+    if(T.b<=2&&w.b<=2) tw.push('가볍고 깔끔한 맛을 원하셔서 산뜻한 와인이에요');
+    if(T.t<=2&&w.t<=2&&w.type==='red') tw.push('떫은맛이 적은 부드러운 레드예요');
+    return {w,sc,why:[...tw.slice(0,2),...why]};
+  }).sort((x,y)=>y.sc-x.sc);
+  const pick=[];const grapes=new Set();const typeCount={};
+  for(const it of scored){
+    if(pick.length>=4)break;
+    if(grapes.has(it.w.grape)&&pick.length<3)continue;
+    if((ans.type==='any'||!ans.type)&&(typeCount[it.w.type]||0)>=3)continue;
+    pick.push(it);grapes.add(it.w.grape);typeCount[it.w.type]=(typeCount[it.w.type]||0)+1;
+  }
+  for(const it of scored){if(pick.length>=4)break;if(!pick.includes(it))pick.push(it);}
+  pick.forEach(it=>{const u=[...new Set(it.why)];it.why=u.slice(0,3);if(!it.why.length)it.why=['맛의 균형이 좋아 처음 마시기에도 편해요'];});
+  return {T,items:pick.map(it=>({id:it.w.id,why:it.why})),ans,date:new Date().toISOString()};
+}
+function nickname(T,type){
+  let f='균형파';
+  if(T.s>=3.5)f='달콤파';else if(T.a>=4.5&&T.b<=3)f='상큼파';else if(T.b>=4.5)f='진한맛파';else if(T.b<=1.5)f='깔끔파';
+  const t=type&&type!=='any'?TYPES[type].label:'와인';
+  return `${f} ${t} 탐험가`;
+}
+
+/* ---------- 화면 ---------- */
+function render(){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.go===S.tab));
+  ({home:renderHome,learn:renderLearn,pick:renderPick,log:renderLog})[S.tab]();
+  window.scrollTo(0,0);
+}
+function go(tab){S.tab=tab;try{if(location.hash.slice(1)!==tab)history.replaceState(null,'','#'+tab);}catch(e){}render();}
+
+function renderHome(){
+  const last=store.get('lastResult',null);const recs=store.get('records',[]);
+  let h=`<section class="hero">
+    <svg class="deco" viewBox="0 0 34 41"><path d="M5 2h24c0 13-4 21-12 21S5 15 5 2z" fill="#fff"/><path d="M17 23v13M11 39h12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+    <h1>와인, 어렵지 않아요</h1>
+    <p>기초를 쉽게 배우고, 몇 가지 질문에 답하면<br>내 입맛에 맞는 와인 3~4개를 골라 드려요.</p>
+    <button class="btn light" data-go="pick">바로 추천받기 ${chev}</button>
+  </section>
+  <h2>이렇게 써 보세요</h2>
+  <div class="steps">
+    <button class="step" data-go="learn"><span class="num">1</span><span><h3>와인 기초 배우기</h3><span class="muted small">카드 6장, 3분이면 충분해요</span></span><span class="arr">${chev}</span></button>
+    <button class="step" data-go="pick"><span class="num">2</span><span><h3>내 취향 찾고 추천받기</h3><span class="muted small">일상 질문 7개에 답하면 끝</span></span><span class="arr">${chev}</span></button>
+    <button class="step" data-go="log"><span class="num">3</span><span><h3>마셔 본 와인 기록하기</h3><span class="muted small">기록할수록 추천이 정확해져요</span></span><span class="arr">${chev}</span></button>
+  </div>`;
+  if(last){
+    h+=`<div class="sec-title"><h2>지난번 추천</h2><button class="link" data-go="pick">자세히</button></div>
+    <div class="mini">${last.items.map(it=>{const w=WMAP[it.id];return w?`<button class="minicard" data-go="pick">${glass(w.type,26)}<b>${esc(w.name)}</b><span class="muted small">${TYPES[w.type].label}</span></button>`:''}).join('')}</div>`;
+  }
+  if(recs.length){
+    const r=[...recs].sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
+    const w=WMAP[r.style];
+    h+=`<div class="sec-title"><h2>최근 기록</h2><button class="link" data-go="log">전체 ${recs.length}개</button></div>
+    ${recCard(r)}`;
+  }
+  h+=`<p class="foot">술은 법적으로 마실 수 있는 나이부터, 적당히 즐겨요.</p>`;
+  view.innerHTML=h;
+}
+
+function renderLearn(){
+  const i=S.learn,c=LEARN[i],last=i===LEARN.length-1;
+  view.innerHTML=`<h1 style="font-size:23px">와인 기초</h1>
+  <div class="lcard">
+    <div class="lart">${c.art()}</div>
+    <div class="lbody"><div class="kicker">${c.k}</div><h2 style="margin-top:4px">${c.t}</h2>${c.b}<div class="tip">💡 ${c.tip}</div></div>
+  </div>
+  <div class="dots">${LEARN.map((_,j)=>`<i class="${j===i?'on':''}"></i>`).join('')}</div>
+  <div class="row">
+    <button class="btn ghost" id="lPrev" ${i===0?'disabled style="opacity:.35"':''}>이전</button>
+    ${last?`<button class="btn" data-go="pick">취향 찾으러 가기</button>`:`<button class="btn" id="lNext">다음</button>`}
+  </div>`;
+  const p=$('#lPrev'),n=$('#lNext');
+  if(p)p.onclick=()=>{if(S.learn>0){S.learn--;renderLearn();window.scrollTo(0,0);}};
+  if(n)n.onclick=()=>{S.learn++;store.set('learnIdx',S.learn);renderLearn();window.scrollTo(0,0);};
+}
+
+function renderPick(){
+  if(S.quiz) return renderQuiz();
+  const last=store.get('lastResult',null);
+  if(last) return renderResult(last);
+  view.innerHTML=`<h1>내 취향 찾기</h1>
+  <p class="muted">와인 용어를 몰라도 괜찮아요. 평소 입맛만 알려 주세요.</p>
+  <div class="card">
+    <div style="display:flex;gap:10px;justify-content:center;margin:6px 0 14px">${['red','white','rose','sparkling'].map(t=>glass(t,34)).join('')}</div>
+    <p>질문 7개에 답하면, 내 입맛과 오늘 음식, 예산에 맞는 와인 <b>3~4개</b>를 이유와 함께 골라 드려요.</p>
+    <p class="small muted">마셔 본 와인을 기록해 두면, 좋았던 스타일은 더 추천하고 별로였던 스타일은 빼 드려요.</p>
+    <button class="btn block" id="startQ">시작하기</button>
+  </div>`;
+  $('#startQ').onclick=startQuiz;
+}
+function startQuiz(){S.quiz={step:0,ans:{}};S.tab='pick';render();}
+function renderQuiz(){
+  const st=S.quiz.step,Q=QUIZ[st],opts=Q.opts||budgetOpts(),cur=S.quiz.ans[Q.id];
+  view.innerHTML=`<button class="back" id="qBack"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg>${st===0?'그만하기':'이전 질문'}</button>
+  <div class="progress"><i style="width:${(st+1)/QUIZ.length*100}%"></i></div>
+  <div class="muted small">${st+1} / ${QUIZ.length}</div>
+  <h1 style="font-size:24px">${Q.q}</h1>
+  ${Q.hint?`<p class="muted small">${Q.hint}</p>`:''}
+  <div>${opts.map(([v,l,sub])=>`<button class="opt ${cur===v?'on':''}" data-v="${v}"><span class="o"></span><span>${esc(l)}${sub?`<small>${esc(sub)}</small>`:''}</span></button>`).join('')}</div>`;
+  $('#qBack').onclick=()=>{if(st===0){S.quiz=null;}else S.quiz.step--;render();};
+  view.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    S.quiz.ans[Q.id]=b.dataset.v;
+    b.classList.add('on');
+    setTimeout(()=>{
+      if(st<QUIZ.length-1){S.quiz.step++;renderQuiz();window.scrollTo(0,0);}
+      else{const res=recommend(S.quiz.ans);store.set('lastResult',res);S.quiz=null;render();}
+    },180);
+  });
+}
+function renderResult(res){
+  const T=res.T;
+  view.innerHTML=`<div class="profile">
+    <div class="muted small">나의 와인 취향</div>
+    <div class="nick">${esc(nickname(T,res.ans.type))}</div>
+    ${tasteBlock(T)}
+    <p class="small muted" style="margin:12px 0 0">${res.ans.food?esc(FOOD[res.ans.food]):''}${res.ans.occ?' · '+esc(OCC[res.ans.occ]):''}${+res.ans.budget?' · '+esc(PRICE[settings.currency][res.ans.budget]):''}</p>
+  </div>
+  <h2>추천 와인 ${res.items.length}개</h2>
+  ${res.items.map((it,i)=>wineCard(WMAP[it.id],it.why,i)).join('')}
+  <div class="tip">🛒 와인 가게에서는 추천 이름을 보여 주면서 "이런 스타일로 추천해 주세요"라고 물어보세요. 예시 제품은 가게마다 없을 수도 있어요.</div>
+  <div class="row" style="margin-top:8px"><button class="btn ghost" id="redo">다시 하기</button><button class="btn" data-go="log">기록하러 가기</button></div>`;
+  $('#redo').onclick=startQuiz;
+  bindWineActions();
+}
+function wineCard(w,why,i){
+  if(!w)return'';
+  const P=PRICE[settings.currency];
+  return `<article class="wine">
+   <div class="whead"><div class="g">${glass(w.type,36)}</div><div><div class="rank">추천 ${i+1}</div><h3 style="font-size:19px">${esc(w.name)}</h3><span class="chip">${TYPES[w.type].label}</span><span class="chip gray">${esc(w.grape)}</span></div></div>
+   <div class="wbody">
+     <p>${esc(w.desc)}</p>
+     <div class="why"><b class="small" style="color:var(--wine3)">이래서 골랐어요</b>${why.map(x=>`<div>· ${esc(x)}</div>`).join('')}</div>
+     ${tasteBlock(w)}
+     <dl class="kv"><dt>향</dt><dd>${esc(w.aroma)}</dd><dt>잘 맞는 음식</dt><dd>${w.food.filter(f=>FOODSHORT[f]).map(f=>FOODSHORT[f]).join(', ')}</dd><dt>가격대</dt><dd>${w.price.map(p=>P[p]).join(' / ')}</dd><dt>마시는 온도</dt><dd>${esc(w.temp)}</dd><dt>예시</dt><dd>${esc(w.ex)}</dd></dl>
+     <div class="ask">🗣️ 가게에서: "<b>${esc(w.name)}</b> 중에 ${esc(P[w.price[0]])}로 추천해 주세요."</div>
+     <button class="btn soft block" data-rec="${w.id}">마셔 봤어요 · 기록하기</button>
+   </div></article>`;
+}
+function bindWineActions(){view.querySelectorAll('[data-rec]').forEach(b=>b.onclick=()=>openRecord(null,b.dataset.rec));}
+
+function recCard(r){
+  const w=WMAP[r.style];const type=w?w.type:(r.type||'red');
+  return `<button class="rec" data-edit="${esc(r.id)}"><div class="g">${glass(type,28)}</div><div class="t"><b>${esc(r.name)}</b><span class="stars">${stars(r.rating||0)}</span> <span class="muted small">${esc(fmtDate(r.date))}</span>${r.memo?`<div class="muted small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.memo)}</div>`:''}</div>${chev}</button>`;
+}
+function fmtDate(d){if(!d)return'';const p=d.split('-');return p.length===3?`${+p[1]}월 ${+p[2]}일`:d;}
+function renderLog(){
+  const recs=store.get('records',[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  let h=`<div class="sec-title"><h1 style="font-size:24px">내 와인 기록</h1><button class="btn" id="addRec" style="min-height:42px;padding:10px 14px">+ 기록</button></div>`;
+  if(!recs.length){
+    h+=`<div class="card empty">${glass('red',60)}<p style="margin-top:10px"><b>아직 기록이 없어요</b></p><p class="small">마셔 본 와인을 별점과 함께 남겨 보세요.<br>좋았던 스타일은 다음 추천에 더 많이 나와요.</p><button class="btn block" id="addRec2">첫 와인 기록하기</button></div>`;
+  }else{
+    const avg=(recs.reduce((s,r)=>s+(r.rating||0),0)/recs.length).toFixed(1);
+    const tc={};recs.forEach(r=>{const w=WMAP[r.style];const t=w?w.type:r.type;if(t&&(r.rating||0)>=4)tc[t]=(tc[t]||0)+1;});
+    const fav=Object.entries(tc).sort((a,b)=>b[1]-a[1])[0];
+    h+=`<div class="stats"><div class="stat"><b>${recs.length}</b><span>마신 와인</span></div><div class="stat"><b>${avg}</b><span>평균 별점</span></div><div class="stat"><b>${fav?TYPES[fav[0]].label:'—'}</b><span>좋아한 종류</span></div></div>`;
+    h+=recs.map(recCard).join('');
+  }
+  view.innerHTML=h;
+  const a=$('#addRec'),a2=$('#addRec2');
+  if(a)a.onclick=()=>openRecord();if(a2)a2.onclick=()=>openRecord();
+  view.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openRecord(b.dataset.edit));
+}
+
+/* ---------- 시트 ---------- */
+function openSheet(html,onMount){
+  closeSheet();
+  const s=document.createElement('div');s.className='scrim';s.id='scrim';
+  s.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
+  s.addEventListener('click',e=>{if(e.target===s)closeSheet();});
+  document.body.appendChild(s);document.body.style.overflow='hidden';
+  onMount&&onMount(s);
+}
+function closeSheet(){const s=$('#scrim');if(s)s.remove();document.body.style.overflow='';}
+function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+
+function openRecord(id,styleId){
+  const recs=store.get('records',[]);
+  const r=id?recs.find(x=>x.id===id):null;
+  const d=r||{name:styleId&&WMAP[styleId]?WMAP[styleId].name:'',style:styleId||'',date:today(),rating:0,price:'',food:'',memo:''};
+  let rating=d.rating||0;
+  const groups=Object.keys(TYPES).map(t=>`<optgroup label="${TYPES[t].label}">${WINES.filter(w=>w.type===t).map(w=>`<option value="${w.id}" ${d.style===w.id?'selected':''}>${esc(w.name)}</option>`).join('')}</optgroup>`).join('');
+  openSheet(`<h2 style="margin-top:4px">${r?'기록 고치기':'마셔 본 와인 기록'}</h2>
+  <form id="recForm">
+    <div class="field"><label for="fName">와인 이름</label><input id="fName" required maxlength="80" placeholder="예: 킴 크로포드 소비뇽 블랑" value="${esc(d.name)}"></div>
+    <div class="field"><label for="fStyle">어떤 스타일이에요?</label><select id="fStyle"><option value="">잘 모르겠어요 / 목록에 없어요</option>${groups}</select>
+      <div class="small muted" style="margin-top:4px">스타일을 고르면 다음 추천에 반영돼요.</div></div>
+    <div class="field" id="typeField" style="${d.style?'display:none':''}"><label>종류</label><div class="seg" id="fType">${Object.keys(TYPES).map(t=>`<button type="button" data-t="${t}" class="${(d.type||'red')===t?'on':''}">${TYPES[t].label}</button>`).join('')}</div></div>
+    <div class="field"><label>별점</label><div class="starpick" id="fStars">${[1,2,3,4,5].map(n=>`<button type="button" data-n="${n}" aria-label="${n}점" class="${n<=rating?'on':''}">★</button>`).join('')}</div></div>
+    <div class="row"><div class="field"><label for="fDate">마신 날</label><input id="fDate" type="date" value="${esc(d.date)}"></div>
+    <div class="field"><label for="fPrice">가격</label><input id="fPrice" maxlength="20" placeholder="${settings.currency==='KRW'?'예: 25,000원':'예: $18'}" value="${esc(d.price)}"></div></div>
+    <div class="field"><label for="fFood">함께 먹은 음식</label><input id="fFood" maxlength="60" placeholder="예: 연어 샐러드" value="${esc(d.food)}"></div>
+    <div class="field"><label for="fMemo">메모</label><textarea id="fMemo" maxlength="500" placeholder="어떤 맛이었어요? 또 사고 싶나요?">${esc(d.memo)}</textarea></div>
+    <button class="btn block" type="submit">저장하기</button>
+    ${r?`<button class="btn danger block" type="button" id="delRec" style="margin-top:10px">이 기록 지우기</button>`:''}
+    <button class="btn ghost block" type="button" id="cancelRec" style="margin-top:10px;border:0">닫기</button>
+  </form>`,s=>{
+    let type=d.type||'red';
+    s.querySelectorAll('#fStars button').forEach(b=>b.onclick=()=>{rating=+b.dataset.n;s.querySelectorAll('#fStars button').forEach(x=>x.classList.toggle('on',+x.dataset.n<=rating));});
+    s.querySelectorAll('#fType button').forEach(b=>b.onclick=()=>{type=b.dataset.t;s.querySelectorAll('#fType button').forEach(x=>x.classList.toggle('on',x===b));});
+    const sel=s.querySelector('#fStyle');
+    sel.onchange=()=>{s.querySelector('#typeField').style.display=sel.value?'none':'';const n=s.querySelector('#fName');if(!n.value&&sel.value)n.value=WMAP[sel.value].name;};
+    s.querySelector('#cancelRec').onclick=closeSheet;
+    const del=s.querySelector('#delRec');
+    if(del){let armed=false;del.onclick=()=>{if(!armed){armed=true;del.textContent='정말 지울까요? 한 번 더 누르세요';return;}
+      store.set('records',store.get('records',[]).filter(x=>x.id!==id));closeSheet();toast('기록을 지웠어요');render();};}
+    s.querySelector('#recForm').onsubmit=e=>{
+      e.preventDefault();
+      const name=s.querySelector('#fName').value.trim();
+      if(!name){s.querySelector('#fName').focus();return;}
+      if(!rating){toast('별점을 눌러 주세요');return;}
+      const style=sel.value;
+      const rec={id:r?r.id:('r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),name,style,type:style?WMAP[style].type:type,rating,
+        date:s.querySelector('#fDate').value||today(),price:s.querySelector('#fPrice').value.trim(),food:s.querySelector('#fFood').value.trim(),memo:s.querySelector('#fMemo').value.trim()};
+      const all=store.get('records',[]);const k=all.findIndex(x=>x.id===rec.id);
+      if(k>=0)all[k]=rec;else all.push(rec);
+      store.set('records',all);closeSheet();toast(r?'고쳤어요':'기록했어요 🍷');
+      if(!r&&S.tab!=='log'){S.tab='log';}
+      render();
+    };
+  });
+}
+
+function openSettings(){
+  openSheet(`<h2 style="margin-top:4px">설정</h2>
+  <div class="field"><label>가격 단위</label><div class="seg" id="cur"><button type="button" data-c="KRW" class="${settings.currency==='KRW'?'on':''}">원 (₩)</button><button type="button" data-c="USD" class="${settings.currency==='USD'?'on':''}">달러 ($)</button></div></div>
+  <div class="card" style="margin:16px 0"><h3>친구에게 알려 주기</h3><p class="small muted">이 앱 주소를 복사해서 카톡이나 문자로 보내세요. 친구 기록은 친구 폰에만 저장돼요.</p><button class="btn soft block" id="share">주소 복사하기</button></div>
+  <div class="card" style="margin:16px 0"><h3>백업</h3><p class="small muted">기록은 이 폰의 이 브라우저에만 저장돼요. 브라우저 데이터를 지우면 사라지니 가끔 백업해 두세요.</p>
+    <div class="row"><button class="btn ghost" id="exp">백업 복사</button><button class="btn ghost" id="imp">백업 불러오기</button></div>
+    <textarea id="bk" style="display:none;width:100%;min-height:110px;margin-top:10px;border:1.5px solid var(--line);border-radius:12px;padding:10px;font-size:13px" placeholder="복사해 둔 백업 내용을 여기에 붙여 넣으세요"></textarea>
+    <button class="btn block" id="impGo" style="display:none;margin-top:8px">이 내용으로 불러오기</button>
+  </div>
+  <button class="btn danger block" id="wipe">모든 기록 지우기</button>
+  <p class="foot">WinePick · 홈 화면에 추가하면 앱처럼 쓸 수 있어요<br>아이폰: 사파리 공유 버튼 → 홈 화면에 추가<br>안드로이드: 크롬 ⋮ 메뉴 → 홈 화면에 추가</p>
+  <button class="btn ghost block" id="closeS" style="border:0">닫기</button>`,s=>{
+    s.querySelectorAll('#cur button').forEach(b=>b.onclick=()=>{settings.currency=b.dataset.c;store.set('settings',settings);s.querySelectorAll('#cur button').forEach(x=>x.classList.toggle('on',x===b));render();});
+    s.querySelector('#closeS').onclick=closeSheet;
+    s.querySelector('#share').onclick=async()=>{
+      const url=location.href.split('#')[0];
+      try{if(navigator.share){await navigator.share({title:'WinePick',text:'와인 초보를 위한 와인 추천 앱이에요',url});return;}}catch(e){if(e&&e.name==='AbortError')return;}
+      copyText(url,'주소를 복사했어요');
+    };
+    const bk=s.querySelector('#bk'),go=s.querySelector('#impGo');
+    s.querySelector('#exp').onclick=()=>{
+      const data=JSON.stringify({app:'WinePick',v:1,records:store.get('records',[]),settings});
+      bk.style.display='';go.style.display='none';bk.value=data;bk.select();
+      copyText(data,'백업을 복사했어요. 메모장이나 나에게 보내기로 저장해 두세요');
+    };
+    s.querySelector('#imp').onclick=()=>{bk.style.display='';go.style.display='';bk.value='';bk.focus();};
+    go.onclick=()=>{
+      try{const o=JSON.parse(bk.value);if(!o||!Array.isArray(o.records))throw 0;
+        const cur=store.get('records',[]);const ids=new Set(cur.map(x=>x.id));
+        const add=o.records.filter(x=>x&&x.id&&x.name&&!ids.has(x.id));
+        store.set('records',cur.concat(add));toast(`기록 ${add.length}개를 불러왔어요`);closeSheet();render();
+      }catch(e){toast('백업 내용을 읽을 수 없어요');}
+    };
+    const w=s.querySelector('#wipe');let armed=false;
+    w.onclick=()=>{if(!armed){armed=true;w.textContent='정말 모두 지울까요? 한 번 더 누르세요';return;}
+      store.set('records',[]);store.set('lastResult',null);closeSheet();toast('모두 지웠어요');render();};
+  });
+}
+async function copyText(t,msg){
+  try{await navigator.clipboard.writeText(t);toast(msg);return;}catch(e){}
+  try{const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();if(ok){toast(msg);return;}}catch(e){}
+  toast('복사가 안 돼요. 주소창의 주소를 직접 복사해 주세요');
+}
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2400);}
+
+/* ---------- 시작 ---------- */
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b&&!b.closest('.sheet')){e.preventDefault();if(b.dataset.go==='pick'&&S.tab==='pick'&&!S.quiz&&!store.get('lastResult',null)){}go(b.dataset.go);}});
+$('#settingsBtn').onclick=openSettings;
+S.learn=Math.min(store.get('learnIdx',0)||0,LEARN.length-1);
+function fromHash(){const h=(location.hash||'').slice(1);if(['home','learn','pick','log'].includes(h)){S.tab=h;}}
+/* 시작 화면 */
+(function splash(){
+  const sp=$('#splash');if(!sp)return;
+  for(let i=0;i<14;i++){const b=document.createElement('i');b.className='bub';const z=4+Math.random()*9;
+    b.style.cssText=`width:${z}px;height:${z}px;left:${Math.random()*100}%;animation-duration:${4+Math.random()*4}s;animation-delay:${Math.random()*3}s;--dx:${(Math.random()-.5)*60}px`;sp.appendChild(b);}
+  let reduced=false;try{reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+  let done=false;
+  function leave(){if(done)return;done=true;sp.classList.add('out');const app=$('#app');app.classList.add('enter');
+    setTimeout(()=>{sp.remove();app.classList.remove('enter');},850);}
+  sp.addEventListener('click',leave);
+  sp.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();leave();}});
+  try{sp.focus();}catch(e){}
+})();
+fromHash();window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(h!==S.tab&&['home','learn','pick','log'].includes(h)){S.tab=h;render();}});
+render();
+})();
+</script>
+</body>
+</html>
