@@ -372,6 +372,31 @@ main .stats + .medals .medal{color:#FBE3EA}
 .crop-btns .btn.ghost{color:#F7C7D2;border-color:rgba(247,199,210,.5)}
 .pp-btns button{font-size:14px}
 .ver{text-align:center;font-size:11px;color:#9C7C84;opacity:.75;margin:0 0 6px;letter-spacing:.04em}
+/* 검색 */
+.topbtns{display:flex;gap:8px}
+.sheet.tall{max-height:88vh;max-height:88dvh}
+.sr-box{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:0 12px;color:var(--muted);margin:6px 0 12px}
+.sr-box:focus-within{border-color:var(--wine3)}
+.sr-box input{flex:1;border:0;outline:0;background:none;padding:12px 0;font-size:16px;min-width:0}
+.sr-hint{font-size:13px;font-weight:700;color:var(--muted);margin:4px 0 8px}
+.sr-chips{display:flex;flex-wrap:wrap;gap:8px}
+.sr-chips button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-size:14px;font-weight:600;color:var(--wine)}
+.sr-sec{margin:14px 0 4px}
+.sr-sec h3{font-size:14px;color:var(--muted);margin:0 0 6px}.sr-sec h3 span{color:var(--wine3);margin-left:4px}
+.sr-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#fff;border:0;border-radius:14px;box-shadow:var(--shadow);padding:10px 12px;margin:6px 0;color:var(--ink)}
+.sr-row .g{flex:none;width:34px;height:40px;border-radius:10px;background:var(--cream);display:grid;place-items:center;font-size:18px}
+.sr-row .g.lv{font-size:12px;font-weight:800;color:var(--wine);width:40px}
+.sr-row .tx{flex:1;min-width:0}
+.sr-row .tx b{display:block;font-size:15px;line-height:1.35}
+.sr-row .tx small{display:block;font-size:12px;color:var(--muted);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sr-row svg{flex:none;color:var(--muted)}
+.sr-empty{text-align:center;color:var(--muted);padding:22px 8px 12px;font-size:15px}
+.sr-foot{text-align:center;color:var(--muted);font-size:13px;margin:18px 0 6px}
+.sr-ext{display:flex;gap:8px}.sr-ext .btn{flex:1;min-height:42px;padding:8px;font-size:14px;text-decoration:none}
+.sr-back{margin:0 0 6px;color:var(--muted)!important}
+.sr-style{background:#FBF7F1;border:1px solid var(--line);border-radius:14px;padding:12px;margin:12px 0}
+.sr-prod .tier{display:inline-block;vertical-align:middle}
+.sheet .link{color:var(--wine)}
 </style>
 </head>
 <body>
@@ -431,9 +456,10 @@ main .stats + .medals .medal{color:#FBE3EA}
     <button class="brand" data-go="home" aria-label="WinePick 홈으로">
       <span class="script"><span style="color:#B30737">Wine</span><span style="color:#C9B45A">Pick</span></span>
     </button>
+    <div class="topbtns"><button class="iconbtn" id="searchBtn" aria-label="와인 찾기"><svg viewBox="0 0 24 24" fill="none" stroke="#B30737" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
     <button class="iconbtn" id="settingsBtn" aria-label="설정">
       <svg viewBox="0 0 24 24" fill="none" stroke="#B30737" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-    </button>
+    </button></div>
   </header>
   <main id="view"></main>
   <nav class="tabs" id="tabs">
@@ -505,32 +531,357 @@ const WINES=[
  {id:'champagne',name:'프랑스 샴페인',type:'sparkling',grape:'샤르도네·피노 누아',s:1,a:5,t:0,b:3,price:[3],food:['seafood','chicken','none'],occ:['gift','date','party'],aroma:'레몬, 사과, 갓 구운 빵, 견과',desc:'프랑스 샹파뉴 지역에서만 만드는 스파클링이에요. 축하하는 날, 선물로 가장 확실해요.',temp:'7~9°C',ex:'모엣 샹동(Moët & Chandon), 뵈브 클리코(Veuve Clicquot)'},
  {id:'moscato',name:'모스카토 다스티',type:'sparkling',grape:'모스카토',s:5,a:3,t:0,b:1,price:[1],food:['dessert','spicy','none'],occ:['alone','date'],aroma:'복숭아, 청포도, 꿀, 꽃',desc:'달콤하고 살짝 톡 쏘는 와인이에요. 도수가 5% 정도로 낮아서 술이 약한 사람도 즐기기 좋아요.',temp:'6~8°C',ex:"라벨에 Moscato d'Asti 표시"},
  {id:'brachetto',name:'브라케토 다퀴',type:'sparkling',grape:'브라케토',s:4,a:3,t:1,b:1,price:[1,2],food:['dessert','none'],occ:['date','party'],aroma:'딸기, 장미, 라즈베리',desc:'붉은빛의 달콤한 거품 와인이에요. 초콜릿, 딸기 케이크와 함께하면 분위기가 살아나요.',temp:'6~8°C',ex:"라벨에 Brachetto d'Acqui 표시"},
- {id:'port',name:'포트 와인',type:'dessert',grape:'포르투갈 토착 품종',s:5,a:2,t:3,b:5,price:[2,3],food:['dessert','cheese'],occ:['gift','alone'],aroma:'건포도, 캐러멜, 초콜릿, 견과',desc:'달고 진하며 도수가 20% 정도로 높아요. 작은 잔에 조금씩, 초콜릿이나 블루치즈와 마셔요. 열고 나서도 몇 주 보관돼요.',temp:'14~16°C',ex:"그레이엄스(Graham's), 테일러스(Taylor's)"}
+ {id:'port',name:'포트 와인',type:'dessert',grape:'포르투갈 토착 품종',s:5,a:2,t:3,b:5,price:[2,3],food:['dessert','cheese'],occ:['gift','alone'],aroma:'건포도, 캐러멜, 초콜릿, 견과',desc:'달고 진하며 도수가 20% 정도로 높아요. 작은 잔에 조금씩, 초콜릿이나 블루치즈와 마셔요. 열고 나서도 몇 주 보관돼요.',temp:'14~16°C',ex:"그레이엄스(Graham's), 테일러스(Taylor's)"},
+ {id:'beaujolais',name:'프랑스 보졸레',type:'red',grape:'가메',s:1,a:4,t:1,b:2,price:[1,2],food:['chicken','pizza','cheese','none'],occ:['alone','party'],aroma:'딸기, 라즈베리, 체리, 꽃',desc:'가볍고 과일 향이 풍부한 레드예요. 살짝 시원하게 마시면 더 맛있어요. 매년 11월에 나오는 햇와인 보졸레 누보도 여기 속해요.',temp:'12~14°C',ex:'라벨에 Beaujolais-Villages, Morgon, Fleurie 같은 마을 이름'},
+ {id:'barolo',name:'이탈리아 바롤로·네비올로',type:'red',grape:'네비올로',s:1,a:5,t:5,b:4,price:[2,3],food:['meat','cheese'],occ:['gift','date'],aroma:'장미, 체리, 타르, 감초',desc:'"와인의 왕"이라 불리는 피에몬테의 명품 레드예요. 색은 연한데 떫은맛과 산미가 아주 강해서 숙성할수록 좋아져요. 부담되면 랑게 네비올로부터 시작해 보세요.',temp:'16~18°C',ex:'라벨에 Barolo, Barbaresco, Langhe Nebbiolo'},
+ {id:'rhone',name:'프랑스 론 레드 블렌드',type:'red',grape:'그르나슈·시라 블렌드',s:1,a:3,t:3,b:4,price:[1,2,3],food:['meat','pizza','cheese'],occ:['party','alone','gift'],aroma:'라즈베리, 후추, 허브',desc:'프랑스 남부 론의 따뜻하고 부드러운 블렌드 레드예요. 코트 뒤 론은 가성비 데일리 와인, 샤토뇌프 뒤 파프는 특별한 날 와인이에요.',temp:'16~18°C',ex:'라벨에 Côtes du Rhône, Châteauneuf-du-Pape, Crozes-Hermitage'},
+ {id:'bordeaux',name:'프랑스 보르도 레드',type:'red',grape:'카베르네·메를로 블렌드',s:1,a:3,t:4,b:4,price:[1,2,3],food:['meat','cheese'],occ:['gift','date'],aroma:'블랙커런트, 삼나무, 흑연',desc:'여러 품종을 섞어 만드는 클래식 레드의 기준이에요. 라벨에 품종 대신 샤토(Château) 이름이 크게 적혀 있어요.',temp:'16~18°C',ex:'라벨에 Bordeaux, Médoc, Saint-Émilion'},
+ {id:'ribera',name:'스페인 리베라 델 두에로',type:'red',grape:'템프라니요',s:1,a:3,t:4,b:5,price:[2,3],food:['meat'],occ:['gift','party'],aroma:'블랙베리, 자두, 오크, 감초',desc:'같은 템프라니요라도 리오하보다 더 진하고 힘 있는 스타일이에요. 스페인 내륙 고지대의 큰 일교차가 만든 맛이에요.',temp:'16~18°C',ex:'라벨에 Ribera del Duero'},
+ {id:'carmenere',name:'칠레 카르메네르',type:'red',grape:'카르메네르',s:1,a:3,t:3,b:4,price:[1,2],food:['meat','pizza'],occ:['alone','party'],aroma:'블랙베리, 피망, 후추, 초콜릿',desc:'원래 보르도 품종이지만 지금은 칠레를 대표하는 레드예요. 부드러운 탄닌에 살짝 풋고추 같은 향이 특징이에요.',temp:'16~18°C',ex:'라벨에 Carmenère'},
+ {id:'amarone',name:'이탈리아 아마로네·리파소',type:'red',grape:'코르비나 블렌드',s:2,a:3,t:4,b:5,price:[2,3],food:['meat','cheese'],occ:['gift','alone'],aroma:'말린 체리, 건포도, 초콜릿',desc:'포도를 몇 달 동안 말려서 만드는 베네토의 진한 레드예요. 리파소(Ripasso)는 아마로네 찌꺼기로 한 번 더 숙성한, 더 가볍고 값도 착한 동생이에요.',temp:'16~18°C',ex:'라벨에 Amarone della Valpolicella, Ripasso'},
+ {id:'brunello',name:'이탈리아 브루넬로 디 몬탈치노',type:'red',grape:'산지오베제',s:1,a:4,t:4,b:4,price:[2,3],food:['meat','cheese'],occ:['gift','date'],aroma:'체리, 가죽, 허브, 담배',desc:'토스카나 몬탈치노에서 산지오베제로만 만드는 명품 레드예요. 출시 전에 오래 숙성해요. 로소 디 몬탈치노는 더 어리고 가벼운 동생이에요.',temp:'16~18°C',ex:'라벨에 Brunello di Montalcino, Rosso di Montalcino'},
+ {id:'sancerre',name:'프랑스 상세르·푸이 퓌메',type:'white',grape:'소비뇽 블랑',s:1,a:5,t:0,b:2,price:[2,3],food:['seafood','cheese'],occ:['date','gift'],aroma:'레몬, 자몽, 부싯돌 같은 미네랄',desc:'프랑스 루아르의 소비뇽 블랑이에요. 뉴질랜드보다 향이 차분하고 미네랄 느낌이 강해요. 염소 치즈와 최고의 짝이에요.',temp:'8~10°C',ex:'라벨에 Sancerre, Pouilly-Fumé'},
+ {id:'albarino',name:'스페인 알바리뇨',type:'white',grape:'알바리뇨',s:1,a:5,t:0,b:2,price:[1,2],food:['seafood','none'],occ:['alone','party'],aroma:'복숭아, 레몬, 바다 내음',desc:'스페인 북서쪽 리아스 바이샤스의 상큼한 화이트예요. 짭조름한 느낌이 있어 회, 조개, 해산물 요리와 아주 잘 맞아요.',temp:'8~10°C',ex:'라벨에 Albariño, Rías Baixas'},
+ {id:'gruner',name:'오스트리아 그뤼너 펠트리너',type:'white',grape:'그뤼너 펠트리너',s:1,a:4,t:0,b:2,price:[1,2],food:['seafood','chicken','spicy','none'],occ:['alone','party'],aroma:'청사과, 라임, 백후추',desc:'오스트리아를 대표하는 화이트예요. 상큼하면서 살짝 후추 향이 나서 채소, 샐러드, 아시아 음식과 잘 어울려요.',temp:'8~10°C',ex:'라벨에 Grüner Veltliner'},
+ {id:'gewurz',name:'알자스 게뷔르츠트라미너',type:'white',grape:'게뷔르츠트라미너',s:2,a:2,t:0,b:4,price:[2,3],food:['spicy','cheese'],occ:['date','alone'],aroma:'리치, 장미, 생강',desc:'향이 아주 진한 화이트예요. 산미가 낮고 살짝 달게 느껴져서 매콤한 아시아 음식이나 향이 강한 치즈와 잘 맞아요.',temp:'8~10°C',ex:'라벨에 Gewurztraminer, Alsace'},
+ {id:'chenin',name:'슈냉 블랑 (부브레·남아공)',type:'white',grape:'슈냉 블랑',s:2,a:5,t:0,b:3,price:[1,2],food:['chicken','seafood','spicy'],occ:['alone','date'],aroma:'사과, 배, 꿀, 모과',desc:'프랑스 루아르(부브레·사브니에르)와 남아공의 대표 화이트예요. 드라이부터 달콤한 것까지 다양해서 라벨의 Sec(드라이), Demi-Sec(살짝 단맛)을 확인하세요.',temp:'8~10°C',ex:'라벨에 Vouvray, Savennières, Chenin Blanc'},
+ {id:'burg-white',name:'프랑스 부르고뉴 화이트',type:'white',grape:'샤르도네',s:1,a:4,t:0,b:3,price:[1,2,3],food:['seafood','chicken','cheese'],occ:['date','gift'],aroma:'사과, 레몬, 헤이즐넛, 은은한 버터',desc:'샤르도네의 고향 부르고뉴의 화이트예요. 마콩은 산뜻한 데일리, 푸이 퓌세는 중간, 뫼르소는 고소하고 풍부한 고급 스타일이에요.',temp:'10~12°C',ex:'라벨에 Mâcon, Pouilly-Fuissé, Meursault, Bourgogne Blanc'},
+ {id:'sauternes',name:'프랑스 소테른',type:'dessert',grape:'세미용·소비뇽 블랑',s:5,a:4,t:0,b:4,price:[2,3],food:['dessert','cheese'],occ:['gift','date'],aroma:'살구, 꿀, 오렌지 껍질, 사프란',desc:'귀부병으로 쪼그라든 포도로 만드는 보르도의 달콤한 화이트예요. 블루치즈, 과일 타르트와 잘 맞아요. 작은 병으로도 많이 팔아요.',temp:'8~10°C',ex:'라벨에 Sauternes, Barsac'},
+ {id:'icewine',name:'아이스와인',type:'dessert',grape:'비달·리슬링',s:5,a:4,t:0,b:4,price:[2,3],food:['dessert','cheese'],occ:['gift','date'],aroma:'복숭아, 살구, 꿀, 열대 과일',desc:'나무에 매달린 채 꽁꽁 언 포도를 짜서 만드는 아주 달콤한 와인이에요. 캐나다 온타리오와 독일이 유명하고, 375ml 작은 병이 많아요.',temp:'6~8°C',ex:'라벨에 Icewine, Eiswein'},
+ {id:'cremant',name:'프랑스 크레망',type:'sparkling',grape:'지역 품종',s:1,a:4,t:0,b:2,price:[1,2],food:['seafood','chicken','none'],occ:['party','date'],aroma:'사과, 레몬, 브리오슈',desc:'샴페인과 같은 방식(병 속 2차 발효)으로 프랑스의 다른 지역에서 만든 스파클링이에요. 샴페인 느낌을 훨씬 착한 값에 즐길 수 있어요.',temp:'6~8°C',ex:"라벨에 Crémant d'Alsace, Crémant de Loire, Crémant de Bourgogne"},
+ {id:'lambrusco',name:'이탈리아 람브루스코',type:'sparkling',grape:'람브루스코',s:3,a:4,t:2,b:2,price:[1],food:['pizza','meat','none'],occ:['party','alone'],aroma:'체리, 딸기, 제비꽃',desc:'에밀리아로마냐의 붉은 거품 와인이에요. 달콤한 것(Amabile, Dolce)과 드라이한 것(Secco)이 있어요. 피자, 살라미와 찰떡이에요.',temp:'8~10°C',ex:'라벨에 Lambrusco'},
+ {id:'us-sparkling',name:'미국 스파클링',type:'sparkling',grape:'샤르도네·피노 누아',s:1,a:4,t:0,b:3,price:[1,2],food:['chicken','seafood','none'],occ:['party','gift'],aroma:'사과, 레몬, 토스트',desc:'캘리포니아 등 미국에서 샴페인 방식으로 만든 스파클링이에요. 샴페인 하우스가 세운 곳이 많아 품질이 좋고 값은 더 착해요.',temp:'6~8°C',ex:'라벨에 Méthode Traditionnelle, Brut'}
 ];
 const WMAP=Object.fromEntries(WINES.map(w=>[w.id,w]));
-// 대표 제품 [한글 이름, 영어 이름(라벨), 가격대 1=부담 없이 2=적당히 3=특별한 날]
+// 대표 제품 [한글 이름, 영어 이름, 가격대 1=부담 없이 2=적당히 3=특별한 날, 지역, 한 줄 특징]
 const PRODUCTS={
- 'cab-chile':[['카시예로 델 디아블로 카베르네 소비뇽','Casillero del Diablo Cabernet Sauvignon',1],['산타 리타 120 카베르네 소비뇽','Santa Rita 120 Cabernet Sauvignon',1],['코노 수르 비시클레타 카베르네 소비뇽','Cono Sur Bicicleta Cabernet Sauvignon',1],['몬테스 알파 카베르네 소비뇽','Montes Alpha Cabernet Sauvignon',2],['알마비바','Almaviva',3]],
- 'cab-cal':[['조쉬 셀러 카베르네 소비뇽','Josh Cellars Cabernet Sauvignon',1],['켄달 잭슨 빈트너스 리저브 카베르네','Kendall-Jackson Vintner\'s Reserve Cabernet Sauvignon',2],['루이 마티니 소노마 카베르네','Louis M. Martini Sonoma County Cabernet Sauvignon',2],['로버트 몬다비 나파 밸리 카베르네','Robert Mondavi Napa Valley Cabernet Sauvignon',3],['케이머스 나파 밸리 카베르네','Caymus Napa Valley Cabernet Sauvignon',3]],
- 'pinot':[['메이오미 피노 누아','Meiomi Pinot Noir',2],['라 크레마 소노마 코스트 피노 누아','La Crema Sonoma Coast Pinot Noir',2],['에라스 오리건 피노 누아','Erath Oregon Pinot Noir',2],['루이 자도 부르고뉴 피노 누아','Louis Jadot Bourgogne Pinot Noir',2]],
- 'merlot':[['카시예로 델 디아블로 메를로','Casillero del Diablo Merlot',1],['14 핸즈 메를로','14 Hands Merlot',1],['컬럼비아 크레스트 그랜드 에스테이트 메를로','Columbia Crest Grand Estates Merlot',1],['덕혼 나파 밸리 메를로','Duckhorn Napa Valley Merlot',3]],
- 'malbec':[['알라모스 말벡','Alamos Malbec',1],['트라피체 오크 캐스크 말벡','Trapiche Oak Cask Malbec',1],['카테나 말벡','Catena Malbec',2],['주카르디 Q 말벡','Zuccardi Q Malbec',2]],
- 'shiraz':[['옐로우 테일 쉬라즈','Yellow Tail Shiraz',1],['제이콥스 크릭 쉬라즈','Jacob\'s Creek Shiraz',1],['펜폴즈 쿠눙가 힐 쉬라즈','Penfolds Koonunga Hill Shiraz',1],['펜폴즈 빈 28 쉬라즈','Penfolds Bin 28 Shiraz',2]],
- 'chianti':[['루피노 키안티','Ruffino Chianti',1],['카스텔로 디 가비아노 키안티 클라시코','Castello di Gabbiano Chianti Classico',1],['안티노리 페폴리 키안티 클라시코','Antinori Pèppoli Chianti Classico',2],['루피노 리제르바 두칼레','Ruffino Riserva Ducale Chianti Classico',2]],
- 'rioja':[['쿠네 크리안사','CVNE Cune Rioja Crianza',1],['캄포 비에호 리제르바','Campo Viejo Rioja Reserva',1],['마르케스 데 리스칼 리제르바','Marqués de Riscal Rioja Reserva',2],['파우스티노 I 그란 리제르바','Faustino I Gran Reserva',2]],
- 'zin':[['보글 올드 바인 진판델','Bogle Old Vine Zinfandel',1],['레이븐스우드 빈트너스 블렌드 진판델','Ravenswood Vintners Blend Zinfandel',1],['세게시오 소노마 진판델','Seghesio Sonoma Zinfandel',2],['릿지 쓰리 밸리스','Ridge Three Valleys',2]],
- 'sb-nz':[['오이스터 베이 소비뇽 블랑','Oyster Bay Sauvignon Blanc',1],['킴 크로포드 소비뇽 블랑','Kim Crawford Sauvignon Blanc',1],['빌라 마리아 프라이빗 빈 소비뇽 블랑','Villa Maria Private Bin Sauvignon Blanc',1],['화이트헤이븐 소비뇽 블랑','Whitehaven Sauvignon Blanc',2],['클라우디 베이 소비뇽 블랑','Cloudy Bay Sauvignon Blanc',2]],
- 'chard-cal':[['조쉬 셀러 샤르도네','Josh Cellars Chardonnay',1],['켄달 잭슨 빈트너스 리저브 샤르도네','Kendall-Jackson Vintner\'s Reserve Chardonnay',1],['라 크레마 소노마 코스트 샤르도네','La Crema Sonoma Coast Chardonnay',2],['롬바우어 샤르도네','Rombauer Chardonnay',3]],
- 'chablis':[['라 샤블리지엔 샤블리','La Chablisienne Chablis',2],['루이 자도 샤블리','Louis Jadot Chablis',2],['조셉 드루앵 샤블리','Joseph Drouhin Chablis',2],['윌리엄 페브르 샤블리','William Fèvre Chablis',2]],
- 'riesling':[['닥터 루젠 닥터 엘 리슬링','Dr. Loosen Dr. L Riesling',1],['샤토 생 미셸 리슬링','Chateau Ste. Michelle Riesling',1],['닥터 루젠 벨레너 조넨우어 카비넷','Dr. Loosen Wehlener Sonnenuhr Kabinett',2]],
- 'pg':[['카비트 피노 그리지오','Cavit Pinot Grigio',1],['에코 도마니 피노 그리지오','Ecco Domani Pinot Grigio',1],['산타 마르게리타 피노 그리지오','Santa Margherita Pinot Grigio',2]],
- 'rose':[['라 비에유 페름 로제','La Vieille Ferme Rosé',1],['위스퍼링 엔젤','Whispering Angel Rosé',2],['엠 드 미뉘티','M de Minuty Rosé',2],['미라발 로제','Miraval Rosé',2]],
- 'prosecco':[['라 마르카 프로세코','La Marca Prosecco',1],['미오네토 프로세코 브뤼','Mionetto Prosecco Brut',1],['루피노 프로세코','Ruffino Prosecco',1],['조닌 프로세코','Zonin Prosecco',1]],
- 'cava':[['프레시넷 코르동 네그로','Freixenet Cordon Negro Brut',1],['세구라 비우다스 브뤼 리저바','Segura Viudas Brut Reserva',1],['안나 데 코도르니우','Anna de Codorníu Brut',1]],
- 'champagne':[['니콜라 푀이야트 브뤼 리저브','Nicolas Feuillatte Brut Réserve',2],['모엣 샹동 임페리얼 브뤼','Moët & Chandon Impérial Brut',3],['뵈브 클리코 옐로 라벨','Veuve Clicquot Yellow Label Brut',3],['떼땅져 브뤼 리저브','Taittinger Brut Réserve',3]],
- 'moscato':[['미켈레 키아를로 니볼레','Michele Chiarlo Nivole Moscato d\'Asti',1],['사라코 모스카토 다스티','Saracco Moscato d\'Asti',1],['비에티 카시네타','Vietti Cascinetta Moscato d\'Asti',2]],
- 'brachetto':[['반피 로사 레갈레','Banfi Rosa Regale Brachetto d\'Acqui',2],['브라이다 브라케토 다퀴','Braida Brachetto d\'Acqui',2],['마렌코 피네토','Marenco Pineto Brachetto d\'Acqui',2]],
- 'port':[['샌드맨 파운더스 리저브','Sandeman Founders Reserve Port',1],['그레이엄스 식스 그레이프스','Graham\'s Six Grapes Reserve Port',2],['폰세카 빈 27','Fonseca Bin 27 Port',2],['테일러스 10년 토니','Taylor Fladgate 10 Year Old Tawny Port',2]]
+ 'cab-chile':[
+  ['카시예로 델 디아블로 카베르네 소비뇽','Casillero del Diablo Cabernet Sauvignon',1,'칠레 센트럴 밸리','체리와 블랙베리 맛이 진한 대표 가성비 카베르네'],
+  ['산타 리타 120 카베르네 소비뇽','Santa Rita 120 Cabernet Sauvignon',1,'칠레 센트럴 밸리','부담 없이 마시기 좋은 과일 맛 데일리 레드'],
+  ['코노 수르 비시클레타 카베르네 소비뇽','Cono Sur Bicicleta Cabernet Sauvignon',1,'칠레 센트럴 밸리','자전거 라벨로 유명한 가볍고 친근한 카베르네'],
+  ['몬테스 클래식 시리즈 카베르네 소비뇽','Montes Classic Series Cabernet Sauvignon',1,'칠레 콜차과 밸리','블랙커런트 향에 균형이 좋은 입문용'],
+  ['몬테스 알파 카베르네 소비뇽','Montes Alpha Cabernet Sauvignon',2,'칠레 콜차과 밸리','오크 숙성으로 바닐라 향이 더해진 묵직한 맛'],
+  ['마르케스 데 카사 콘차 카베르네 소비뇽','Marques de Casa Concha Cabernet Sauvignon',2,'칠레 마이포 밸리','민트와 블랙베리 향이 나는 진한 한 단계 위 카베르네'],
+  ['에라주리즈 맥스 카베르네 소비뇽','Errázuriz Max Cabernet Sauvignon',2,'칠레 아콩카과 밸리','잘 익은 과일 맛과 부드러운 탄닌'],
+  ['산타 리타 메달라 레알 카베르네 소비뇽','Santa Rita Medalla Real Cabernet Sauvignon',2,'칠레 마이포 밸리','우아한 구조감의 리저브급 카베르네'],
+  ['돈 멜초','Don Melchor',3,'칠레 마이포 밸리 푸엔테 알토','칠레 최고급 카베르네로 손꼽히는 특별한 날 와인'],
+  ['알마비바','Almaviva',3,'칠레 마이포 밸리','칠레와 보르도 명가가 함께 만든 프리미엄 블렌드']],
+ 'cab-cal':[
+  ['조쉬 셀러 카베르네 소비뇽','Josh Cellars Cabernet Sauvignon',1,'미국 캘리포니아','블랙베리와 바닐라 향의 부드러운 인기 카베르네'],
+  ['조엘 갓 815 카베르네 소비뇽','Joel Gott 815 Cabernet Sauvignon',1,'미국 캘리포니아','과일 맛이 풍부하고 가격 대비 만족도가 높아요'],
+  ['프란시스칸 카베르네 소비뇽','Franciscan Cabernet Sauvignon',1,'미국 캘리포니아','진한 과일 맛과 부드러운 마무리'],
+  ['로버트 몬다비 프라이빗 셀렉션 카베르네','Robert Mondavi Private Selection Cabernet Sauvignon',1,'미국 캘리포니아','버번 통 숙성 버전도 있는 친근한 데일리 카베르네'],
+  ['켄달 잭슨 빈트너스 리저브 카베르네','Kendall-Jackson Vintner\'s Reserve Cabernet Sauvignon',2,'미국 캘리포니아 소노마','잘 익은 체리와 은은한 오크의 균형'],
+  ['루이 마티니 소노마 카베르네','Louis M. Martini Sonoma County Cabernet Sauvignon',2,'미국 캘리포니아 소노마','블랙커런트와 향신료 향이 나는 클래식 스타일'],
+  ['저스틴 카베르네 소비뇽','Justin Cabernet Sauvignon',2,'미국 캘리포니아 파소 로블스','검붉은 과일과 바닐라의 진하고 부드러운 맛'],
+  ['베린저 나이츠 밸리 카베르네','Beringer Knights Valley Cabernet Sauvignon',2,'미국 캘리포니아 소노마 나이츠 밸리','구조감이 좋은 오래된 명가의 카베르네'],
+  ['헤스 알로미 카베르네 소비뇽','Hess Allomi Cabernet Sauvignon',2,'미국 캘리포니아 나파 밸리','나파의 진한 맛을 비교적 착하게 즐기는 와인'],
+  ['로버트 몬다비 나파 밸리 카베르네','Robert Mondavi Napa Valley Cabernet Sauvignon',3,'미국 캘리포니아 나파 밸리','나파 와인의 기준이 된 명가의 대표 카베르네'],
+  ['스태그스 립 와인 셀러스 아르테미스','Stag\'s Leap Wine Cellars Artemis Cabernet Sauvignon',3,'미국 캘리포니아 나파 밸리','부드럽고 우아한 나파 카베르네'],
+  ['실버 오크 알렉산더 밸리 카베르네','Silver Oak Alexander Valley Cabernet Sauvignon',3,'미국 캘리포니아 소노마 알렉산더 밸리','미국 오크 숙성으로 바닐라 향이 풍부해요'],
+  ['케이머스 나파 밸리 카베르네','Caymus Napa Valley Cabernet Sauvignon',3,'미국 캘리포니아 나파 밸리','진하고 부드러운 과일 맛으로 유명한 선물용 와인']],
+ 'pinot':[
+  ['마크 웨스트 피노 누아','Mark West Pinot Noir',1,'미국 캘리포니아','체리 맛이 나는 가볍고 부담 없는 피노 누아'],
+  ['빌라 마리아 프라이빗 빈 피노 누아','Villa Maria Private Bin Pinot Noir',1,'뉴질랜드','딸기와 체리 향의 산뜻한 뉴질랜드 피노'],
+  ['메이오미 피노 누아','Meiomi Pinot Noir',2,'미국 캘리포니아 해안 지역','잘 익은 과일과 바닐라 향의 부드러운 인기 피노'],
+  ['라 크레마 소노마 코스트 피노 누아','La Crema Sonoma Coast Pinot Noir',2,'미국 캘리포니아 소노마 코스트','체리와 향신료 향의 균형 잡힌 피노'],
+  ['에라스 오리건 피노 누아','Erath Oregon Pinot Noir',2,'미국 오리건','산뜻한 산미와 붉은 과일 맛의 오리건 피노'],
+  ['윌래밋 밸리 빈야즈 홀 클러스터 피노 누아','Willamette Valley Vineyards Whole Cluster Pinot Noir',2,'미국 오리건 윌래밋 밸리','꽃향기와 과일 맛이 생생한 가벼운 피노'],
+  ['루이 자도 부르고뉴 피노 누아','Louis Jadot Bourgogne Pinot Noir',2,'프랑스 부르고뉴','부르고뉴 피노의 섬세한 맛을 처음 느끼기 좋아요'],
+  ['조셉 드루앵 라포레 부르고뉴 피노 누아','Joseph Drouhin Laforêt Bourgogne Pinot Noir',2,'프랑스 부르고뉴','체리 향이 맑고 가벼운 데일리 부르고뉴'],
+  ['클라우디 베이 피노 누아','Cloudy Bay Pinot Noir',2,'뉴질랜드 말버러','실키한 질감과 붉은 과일 향'],
+  ['벨 글로스 클라크 앤 텔레폰','Belle Glos Clark & Telephone Pinot Noir',3,'미국 캘리포니아 산타 마리아 밸리','밀랍 봉인 병으로 유명한 진하고 풍부한 피노'],
+  ['도멘 드루앵 오리건 피노 누아','Domaine Drouhin Oregon Pinot Noir',3,'미국 오리건 던디 힐스','부르고뉴 명가가 오리건에서 만든 우아한 피노'],
+  ['코스타 브라운 소노마 코스트 피노 누아','Kosta Browne Sonoma Coast Pinot Noir',3,'미국 캘리포니아 소노마 코스트','진하고 화려한 스타일의 고급 피노']],
+ 'merlot':[
+  ['카시예로 델 디아블로 메를로','Casillero del Diablo Merlot',1,'칠레 센트럴 밸리','자두 맛이 부드러운 가성비 메를로'],
+  ['프론테라 메를로','Frontera Merlot',1,'칠레 센트럴 밸리','가볍고 편하게 마시는 데일리 메를로'],
+  ['14 핸즈 메를로','14 Hands Merlot',1,'미국 워싱턴','체리와 초콜릿 향의 부드러운 맛'],
+  ['컬럼비아 크레스트 그랜드 에스테이트 메를로','Columbia Crest Grand Estates Merlot',1,'미국 워싱턴 컬럼비아 밸리','값 대비 품질이 좋은 워싱턴 메를로'],
+  ['샤토 생 미셸 메를로','Chateau Ste. Michelle Merlot',1,'미국 워싱턴 컬럼비아 밸리','잘 익은 체리 맛과 부드러운 탄닌'],
+  ['스털링 빈트너스 컬렉션 메를로','Sterling Vintner\'s Collection Merlot',1,'미국 캘리포니아','가볍고 과일 맛이 친근한 메를로'],
+  ['엘 에콜 No. 41 메를로','L\'Ecole No. 41 Merlot',2,'미국 워싱턴 컬럼비아 밸리','구조감이 좋은 한 단계 위 메를로'],
+  ['덕혼 나파 밸리 메를로','Duckhorn Napa Valley Merlot',3,'미국 캘리포니아 나파 밸리','미국 메를로의 대표 명가, 진하고 우아해요']],
+ 'malbec':[
+  ['알라모스 말벡','Alamos Malbec',1,'아르헨티나 멘도사','자두와 블랙베리 맛의 가성비 말벡'],
+  ['트라피체 오크 캐스크 말벡','Trapiche Oak Cask Malbec',1,'아르헨티나 멘도사','오크 향이 은은한 부드러운 말벡'],
+  ['노르톤 레세르바 말벡','Norton Reserva Malbec',1,'아르헨티나 멘도사','진한 과일 맛과 부드러운 탄닌'],
+  ['카이켄 말벡','Kaiken Malbec',1,'아르헨티나 멘도사','칠레 몬테스가 만든 아르헨티나 말벡'],
+  ['트리벤토 리저브 말벡','Trivento Reserve Malbec',1,'아르헨티나 멘도사','바이올렛 향이 나는 친근한 데일리 말벡'],
+  ['카테나 말벡','Catena Malbec',2,'아르헨티나 멘도사','고지대 포도로 만든 균형 좋은 대표 말벡'],
+  ['테라자스 데 로스 안데스 레세르바 말벡','Terrazas de los Andes Reserva Malbec',2,'아르헨티나 멘도사','고도 높은 포도밭의 진하고 깔끔한 말벡'],
+  ['주카르디 Q 말벡','Zuccardi Q Malbec',2,'아르헨티나 멘도사 우코 밸리','산뜻한 산미가 살아 있는 세련된 말벡'],
+  ['아차발 페레르 말벡','Achaval-Ferrer Malbec',2,'아르헨티나 멘도사','순수한 과일 맛이 진한 말벡'],
+  ['카테나 알타 말벡','Catena Alta Malbec',3,'아르헨티나 멘도사','카테나의 상위 라인, 진하고 깊은 맛']],
+ 'shiraz':[
+  ['옐로우 테일 쉬라즈','Yellow Tail Shiraz',1,'호주 사우스 이스턴 오스트레일리아','과일 잼 같은 달콤한 느낌의 친근한 쉬라즈'],
+  ['제이콥스 크릭 쉬라즈','Jacob\'s Creek Shiraz',1,'호주 사우스 이스턴 오스트레일리아','부담 없이 마시는 데일리 쉬라즈'],
+  ['린드만 빈 50 쉬라즈','Lindeman\'s Bin 50 Shiraz',1,'호주 사우스 이스턴 오스트레일리아','가볍고 과일 맛이 풍부한 가성비 와인'],
+  ['울프 블라스 옐로우 라벨 쉬라즈','Wolf Blass Yellow Label Shiraz',1,'호주 사우스 오스트레일리아','블랙베리와 후추 향이 나는 대중적인 쉬라즈'],
+  ['펜폴즈 쿠눙가 힐 쉬라즈','Penfolds Koonunga Hill Shiraz',1,'호주 사우스 오스트레일리아','펜폴즈의 입문용, 진하고 부드러워요'],
+  ['펜폴즈 맥스 쉬라즈','Penfolds Max\'s Shiraz',2,'호주 사우스 오스트레일리아','잘 익은 과일과 오크의 풍성한 맛'],
+  ['다렌버그 풋볼트 쉬라즈','d\'Arenberg The Footbolt Shiraz',2,'호주 맥라렌 베일','후추와 블랙베리 향의 맥라렌 베일 쉬라즈'],
+  ['토브렉 우드커터스 쉬라즈','Torbreck Woodcutter\'s Shiraz',2,'호주 바로사 밸리','바로사 쉬라즈의 진하고 풍부한 맛'],
+  ['투 핸즈 날리 듀즈 쉬라즈','Two Hands Gnarly Dudes Shiraz',2,'호주 바로사 밸리','진한 과일 맛이 터지는 힘 있는 쉬라즈'],
+  ['펜폴즈 빈 28 쉬라즈','Penfolds Bin 28 Shiraz',2,'호주 사우스 오스트레일리아','펜폴즈 "빈 시리즈"의 묵직한 쉬라즈'],
+  ['펜폴즈 그랜지','Penfolds Grange',3,'호주 사우스 오스트레일리아','호주 최고급 와인의 상징, 아주 특별한 날 와인']],
+ 'chianti':[
+  ['루피노 키안티','Ruffino Chianti',1,'이탈리아 토스카나','체리 향이 산뜻한 데일리 키안티'],
+  ['카스텔로 디 가비아노 키안티 클라시코','Castello di Gabbiano Chianti Classico',1,'이탈리아 토스카나','검은 수탉 마크의 가성비 키안티 클라시코'],
+  ['카스텔로 반피 키안티 클라시코','Castello Banfi Chianti Classico',1,'이탈리아 토스카나','붉은 과일과 허브 향의 균형 잡힌 맛'],
+  ['로카 델레 마치에 키안티 클라시코','Rocca delle Macìe Chianti Classico',1,'이탈리아 토스카나','피자, 파스타와 편하게 마시기 좋아요'],
+  ['체키 키안티 클라시코','Cecchi Chianti Classico',1,'이탈리아 토스카나','산뜻한 산미의 정통 키안티 클라시코'],
+  ['안티노리 페폴리 키안티 클라시코','Antinori Pèppoli Chianti Classico',2,'이탈리아 토스카나','토스카나 명가 안티노리의 부드러운 키안티'],
+  ['루피노 리제르바 두칼레','Ruffino Riserva Ducale Chianti Classico Riserva',2,'이탈리아 토스카나','더 오래 숙성한 깊은 맛의 리제르바'],
+  ['프레스코발디 니포차노 리제르바','Frescobaldi Nipozzano Chianti Rùfina Riserva',2,'이탈리아 토스카나 루피나','구조감이 좋은 리제르바급 키안티'],
+  ['카스텔로 디 아마 키안티 클라시코','Castello di Ama Chianti Classico',3,'이탈리아 토스카나','섬세하고 우아한 고급 키안티 클라시코']],
+ 'rioja':[
+  ['쿠네 크리안사','CVNE Cune Rioja Crianza',1,'스페인 리오하','체리와 바닐라 향의 부드러운 데일리 리오하'],
+  ['캄포 비에호 리제르바','Campo Viejo Rioja Reserva',1,'스페인 리오하','가성비 좋은 대표 리오하 레세르바'],
+  ['마르케스 데 카세레스 크리안사','Marqués de Cáceres Rioja Crianza',1,'스페인 리오하','붉은 과일과 은은한 오크의 균형'],
+  ['마르케스 데 리스칼 리제르바','Marqués de Riscal Rioja Reserva',2,'스페인 리오하','금색 그물 병으로 유명한 클래식 리오하'],
+  ['무가 레세르바','Muga Rioja Reserva',2,'스페인 리오하','향신료와 과일 향이 풍부한 레세르바'],
+  ['마르케스 데 무리에타 레세르바','Marqués de Murrieta Rioja Reserva',2,'스페인 리오하','진하고 우아한 전통 명가의 레세르바'],
+  ['라 리오하 알타 비냐 아르단사','La Rioja Alta Viña Ardanza Reserva',2,'스페인 리오하','오래 숙성한 부드럽고 깊은 맛'],
+  ['파우스티노 I 그란 리제르바','Faustino I Gran Reserva',2,'스페인 리오하','오랜 숙성의 가죽·바닐라 향, 렘브란트 그림 라벨'],
+  ['쿠네 임페리얼 그란 레세르바','CVNE Imperial Gran Reserva',3,'스페인 리오하','쿠네의 최상위급, 특별한 날 와인']],
+ 'zin':[
+  ['보글 올드 바인 진판델','Bogle Old Vine Zinfandel',1,'미국 캘리포니아','오래된 나무 포도의 진한 잼 같은 맛'],
+  ['레이븐스우드 빈트너스 블렌드 진판델','Ravenswood Vintners Blend Zinfandel',1,'미국 캘리포니아','바비큐와 잘 맞는 친근한 진판델'],
+  ['세븐 데들리 진스','Michael David 7 Deadly Zins',1,'미국 캘리포니아 로다이','진하고 달콤한 과일 맛의 인기 진판델'],
+  ['클링커 브릭 올드 바인 진판델','Klinker Brick Old Vine Zinfandel',1,'미국 캘리포니아 로다이','블랙베리와 향신료 향의 풍성한 맛'],
+  ['세게시오 소노마 진판델','Seghesio Sonoma Zinfandel',2,'미국 캘리포니아 소노마','향신료와 라즈베리 향의 균형 잡힌 진판델'],
+  ['릿지 쓰리 밸리스','Ridge Three Valleys',2,'미국 캘리포니아 소노마','진판델 중심 블렌드, 과일과 구조감의 조화'],
+  ['릿지 리튼 스프링스','Ridge Lytton Springs',3,'미국 캘리포니아 소노마 드라이 크릭 밸리','명가 릿지의 대표 진판델 블렌드'],
+  ['롬바우어 진판델','Rombauer Zinfandel',3,'미국 캘리포니아','진하고 풍부한 과일 맛의 고급 진판델']],
+ 'sb-nz':[
+  ['오이스터 베이 소비뇽 블랑','Oyster Bay Sauvignon Blanc',1,'뉴질랜드 말버러','상큼한 자몽과 라임 향의 인기 와인'],
+  ['킴 크로포드 소비뇽 블랑','Kim Crawford Sauvignon Blanc',1,'뉴질랜드 말버러','패션프루트 향이 톡 쏘는 대표 뉴질랜드 화이트'],
+  ['빌라 마리아 프라이빗 빈 소비뇽 블랑','Villa Maria Private Bin Sauvignon Blanc',1,'뉴질랜드 말버러','깔끔하고 상큼한 가성비 소비뇽 블랑'],
+  ['매투아 소비뇽 블랑','Matua Sauvignon Blanc',1,'뉴질랜드 말버러','풀 향과 열대 과일 향이 산뜻해요'],
+  ['브랑코트 에스테이트 소비뇽 블랑','Brancott Estate Sauvignon Blanc',1,'뉴질랜드 말버러','말버러 소비뇽 블랑을 처음 알린 개척자'],
+  ['기센 소비뇽 블랑','Giesen Sauvignon Blanc',1,'뉴질랜드 말버러','상큼하고 가볍게 마시는 데일리 화이트'],
+  ['세인트 클레어 패밀리 에스테이트 소비뇽 블랑','Saint Clair Family Estate Sauvignon Blanc',1,'뉴질랜드 말버러','향이 풍부하고 생동감 있는 맛'],
+  ['화이트헤이븐 소비뇽 블랑','Whitehaven Sauvignon Blanc',2,'뉴질랜드 말버러','자몽과 레몬 향의 균형 잡힌 맛'],
+  ['노틸러스 소비뇽 블랑','Nautilus Sauvignon Blanc',2,'뉴질랜드 말버러','미네랄과 시트러스 향의 세련된 스타일'],
+  ['독 포인트 소비뇽 블랑','Dog Point Sauvignon Blanc',2,'뉴질랜드 말버러','차분하고 깊이 있는 고급 소비뇽 블랑'],
+  ['클라우디 베이 소비뇽 블랑','Cloudy Bay Sauvignon Blanc',2,'뉴질랜드 말버러','뉴질랜드 와인을 세계에 알린 상징적인 와인']],
+ 'chard-cal':[
+  ['조쉬 셀러 샤르도네','Josh Cellars Chardonnay',1,'미국 캘리포니아','사과와 레몬, 은은한 버터 향'],
+  ['보글 샤르도네','Bogle Chardonnay',1,'미국 캘리포니아','부드럽고 크리미한 가성비 샤르도네'],
+  ['버터 샤르도네','JaM Cellars Butter Chardonnay',1,'미국 캘리포니아','이름처럼 버터 향이 진한 부드러운 화이트'],
+  ['메이오미 샤르도네','Meiomi Chardonnay',1,'미국 캘리포니아 해안 지역','열대 과일과 바닐라의 풍성한 맛'],
+  ['켄달 잭슨 빈트너스 리저브 샤르도네','Kendall-Jackson Vintner\'s Reserve Chardonnay',1,'미국 캘리포니아','미국에서 가장 사랑받는 샤르도네 중 하나'],
+  ['라 크레마 소노마 코스트 샤르도네','La Crema Sonoma Coast Chardonnay',2,'미국 캘리포니아 소노마 코스트','산뜻한 산미와 크리미함의 균형'],
+  ['소노마 커트러 러시안 리버 랜치스 샤르도네','Sonoma-Cutrer Russian River Ranches Chardonnay',2,'미국 캘리포니아 소노마','레스토랑에서 인기 있는 우아한 샤르도네'],
+  ['페라리 카라노 샤르도네','Ferrari-Carano Chardonnay',2,'미국 캘리포니아 소노마','열대 과일과 오크의 풍부한 맛'],
+  ['롬바우어 샤르도네','Rombauer Chardonnay',3,'미국 캘리포니아 카네로스','버터와 바닐라 향이 진한 대표 "버터 샤르도네"'],
+  ['케이크브레드 샤르도네','Cakebread Cellars Chardonnay',3,'미국 캘리포니아 나파 밸리','풍부하면서 균형 잡힌 나파 샤르도네'],
+  ['샤토 몬텔레나 샤르도네','Chateau Montelena Chardonnay',3,'미국 캘리포니아 나파 밸리','1976년 "파리의 심판" 우승으로 유명한 명가']],
+ 'chablis':[
+  ['라 샤블리지엔 샤블리','La Chablisienne Chablis',2,'프랑스 부르고뉴 샤블리','상큼하고 깔끔한 정통 샤블리'],
+  ['루이 자도 샤블리','Louis Jadot Chablis',2,'프랑스 부르고뉴 샤블리','레몬과 미네랄 향의 균형 잡힌 샤블리'],
+  ['조셉 드루앵 샤블리','Joseph Drouhin Chablis',2,'프랑스 부르고뉴 샤블리','맑고 산뜻한 스타일, 굴과 최고의 짝'],
+  ['도멘 라로슈 샤블리 생 마르탱','Domaine Laroche Chablis Saint Martin',2,'프랑스 부르고뉴 샤블리','순수한 과일 맛과 짭조름한 미네랄'],
+  ['시모네 페브르 샤블리','Simonnet-Febvre Chablis',2,'프랑스 부르고뉴 샤블리','청사과 향이 산뜻한 샤블리'],
+  ['장 마크 브로카르 샤블리 생트 클레르','Jean-Marc Brocard Chablis Sainte Claire',2,'프랑스 부르고뉴 샤블리','상쾌하고 깨끗한 맛의 샤블리'],
+  ['윌리엄 페브르 샤블리','William Fèvre Chablis',2,'프랑스 부르고뉴 샤블리','샤블리 명가의 정갈하고 우아한 맛']],
+ 'riesling':[
+  ['닥터 루젠 닥터 엘 리슬링','Dr. Loosen Dr. L Riesling',1,'독일 모젤','살짝 달콤하고 상큼한 인기 리슬링'],
+  ['샤토 생 미셸 리슬링','Chateau Ste. Michelle Riesling',1,'미국 워싱턴 컬럼비아 밸리','복숭아 향의 살짝 단 데일리 리슬링'],
+  ['클린 슬레이트 리슬링','Clean Slate Riesling',1,'독일 모젤','부담 없이 마시는 상큼한 모젤 리슬링'],
+  ['쿵푸 걸 리슬링','Charles Smith Kung Fu Girl Riesling',1,'미국 워싱턴','매운 아시아 음식과 잘 맞는 상큼한 리슬링'],
+  ['퓨지 베일 리슬링','Pewsey Vale Riesling',1,'호주 에덴 밸리','라임 향이 나는 드라이한 호주 리슬링'],
+  ['샤토 생 미셸 에로이카 리슬링','Chateau Ste. Michelle & Dr. Loosen Eroica Riesling',2,'미국 워싱턴 컬럼비아 밸리','독일 명가와 함께 만든 섬세한 리슬링'],
+  ['트림바크 리슬링','Trimbach Riesling',2,'프랑스 알자스','드라이하고 날카로운 산미의 알자스 리슬링'],
+  ['셀바흐 오스터 카비넷','Selbach-Oster Riesling Kabinett',2,'독일 모젤','살짝 단맛과 산미의 균형이 좋은 카비넷'],
+  ['닥터 루젠 벨레너 조넨우어 카비넷','Dr. Loosen Wehlener Sonnenuhr Riesling Kabinett',2,'독일 모젤','해시계 포도밭의 섬세하고 달콤한 리슬링']],
+ 'pg':[
+  ['카비트 피노 그리지오','Cavit Pinot Grigio',1,'이탈리아 트렌티노','가볍고 깔끔한 대중적인 피노 그리지오'],
+  ['에코 도마니 피노 그리지오','Ecco Domani Pinot Grigio',1,'이탈리아 델레 베네치에','레몬 향의 산뜻한 데일리 화이트'],
+  ['메초코로나 피노 그리지오','Mezzacorona Pinot Grigio',1,'이탈리아 트렌티노','청사과 향이 나는 가볍고 상쾌한 맛'],
+  ['루피노 루미나 피노 그리지오','Ruffino Lumina Pinot Grigio',1,'이탈리아 델레 베네치에','깔끔하고 편하게 마시는 화이트'],
+  ['산타 마르게리타 피노 그리지오','Santa Margherita Pinot Grigio',2,'이탈리아 알토 아디제','피노 그리지오를 유명하게 만든 대표 와인'],
+  ['리비오 펠루가 피노 그리지오','Livio Felluga Pinot Grigio',2,'이탈리아 프리울리','지도 라벨로 유명한 풍부한 피노 그리지오'],
+  ['예르만 피노 그리지오','Jermann Pinot Grigio',2,'이탈리아 프리울리','과일 향이 풍부하고 깔끔한 고급 스타일']],
+ 'rose':[
+  ['라 비에유 페름 로제','La Vieille Ferme Rosé',1,'프랑스 방투','닭 그림 라벨의 가볍고 상큼한 가성비 로제'],
+  ['플뢰르 드 프레리 로제','Fleurs de Prairie Rosé',1,'프랑스 프로방스','연한 분홍빛의 깔끔한 로제'],
+  ['비엘레 페르 에 피스 사빈 로제','Bieler Père et Fils Sabine Rosé',1,'프랑스 프로방스','딸기와 수박 향의 산뜻한 로제'],
+  ['스튜디오 바이 미라발','Studio by Miraval Rosé',1,'프랑스 지중해 연안','가볍고 상큼하게 즐기는 미라발의 데일리 로제'],
+  ['햄튼 워터 로제','Hampton Water Rosé',1,'프랑스 랑그독','상큼한 과일 향의 인기 로제'],
+  ['위스퍼링 엔젤','Whispering Angel Rosé',2,'프랑스 코트 드 프로방스','로제 열풍을 이끈 대표 프로방스 로제'],
+  ['엠 드 미뉘티','M de Minuty Rosé',2,'프랑스 코트 드 프로방스','시트러스 향의 산뜻하고 우아한 로제'],
+  ['샤토 미뉘티 프레스티지 로제','Château Minuty Prestige Rosé',2,'프랑스 코트 드 프로방스','미뉘티의 한 단계 위 섬세한 로제'],
+  ['미라발 로제','Miraval Rosé',2,'프랑스 코트 드 프로방스','상큼한 과일과 미네랄의 균형'],
+  ['바이 오트 로제','Domaines Ott By.Ott Rosé',2,'프랑스 코트 드 프로방스','오트 가문의 세련된 프로방스 로제'],
+  ['록 엔젤','Château d\'Esclans Rock Angel Rosé',2,'프랑스 코트 드 프로방스','위스퍼링 엔젤의 형, 더 풍부한 맛']],
+ 'prosecco':[
+  ['라 마르카 프로세코','La Marca Prosecco',1,'이탈리아 베네토','청사과와 꽃향기의 인기 프로세코'],
+  ['미오네토 프로세코 브뤼','Mionetto Prosecco Brut',1,'이탈리아 베네토','오렌지 라벨의 상큼한 건배용 프로세코'],
+  ['미오네토 프로세코 로제','Mionetto Prosecco Rosé',1,'이탈리아 베네토','딸기 향이 나는 분홍빛 프로세코'],
+  ['루피노 프로세코','Ruffino Prosecco',1,'이탈리아 베네토','가볍고 깔끔한 데일리 스파클링'],
+  ['조닌 프로세코','Zonin Prosecco',1,'이탈리아 베네토','부담 없이 즐기는 가성비 프로세코'],
+  ['자르데토 프로세코 브뤼','Zardetto Prosecco Brut',1,'이탈리아 베네토','상쾌하고 드라이한 프로세코'],
+  ['니노 프랑코 루스티코','Nino Franco Rustico Prosecco Superiore',2,'이탈리아 발도비아데네','섬세한 거품의 고급 프로세코'],
+  ['비솔 크레데','Bisol Crede Prosecco Superiore',2,'이탈리아 발도비아데네','꽃향기가 우아한 프로세코 수페리오레'],
+  ['산타 마르게리타 프로세코 수페리오레','Santa Margherita Prosecco Superiore',2,'이탈리아 발도비아데네','깔끔하고 세련된 스파클링']],
+ 'cava':[
+  ['프레시넷 코르동 네그로','Freixenet Cordon Negro Brut',1,'스페인 페네데스','검은 병으로 유명한 대표 가성비 카바'],
+  ['세구라 비우다스 브뤼 리저바','Segura Viudas Brut Reserva',1,'스페인 페네데스','사과와 토스트 향의 깔끔한 카바'],
+  ['세구라 비우다스 아리아','Segura Viudas Aria Estate Brut',1,'스페인 페네데스','상큼하고 가볍게 즐기는 카바'],
+  ['안나 데 코도르니우','Anna de Codorníu Brut',1,'스페인 페네데스','샤르도네가 들어간 부드러운 카바'],
+  ['후베 이 캄프스 레세르바 데 라 파밀리아','Juvé & Camps Reserva de la Familia',2,'스페인 페네데스','오래 숙성한 풍부한 고급 카바'],
+  ['그라모나 임페리얼','Gramona Imperial Brut',2,'스페인 페네데스','깊은 맛의 장기 숙성 카바']],
+ 'champagne':[
+  ['니콜라 푀이야트 브뤼 리저브','Nicolas Feuillatte Brut Réserve',2,'프랑스 샹파뉴','가격 대비 만족도가 높은 샴페인'],
+  ['파이퍼 하이직 퀴베 브뤼','Piper-Heidsieck Cuvée Brut',2,'프랑스 샹파뉴','과일 향이 생기 있는 샴페인'],
+  ['모엣 샹동 임페리얼 브뤼','Moët & Chandon Impérial Brut',3,'프랑스 샹파뉴','세계에서 가장 유명한 샴페인 중 하나'],
+  ['뵈브 클리코 옐로 라벨','Veuve Clicquot Yellow Label Brut',3,'프랑스 샹파뉴','노란 라벨의 풍부하고 힘 있는 샴페인'],
+  ['떼땅져 브뤼 리저브','Taittinger Brut Réserve',3,'프랑스 샹파뉴','샤르도네 비율이 높아 섬세하고 우아해요'],
+  ['로랑 페리에 라 퀴베','Laurent-Perrier La Cuvée',3,'프랑스 샹파뉴','깔끔하고 상쾌한 스타일의 샴페인'],
+  ['폴 로저 브뤼 리저브','Pol Roger Brut Réserve',3,'프랑스 샹파뉴','처칠이 사랑한 샴페인으로 유명해요'],
+  ['볼랭저 스페셜 퀴베','Bollinger Special Cuvée',3,'프랑스 샹파뉴','피노 누아 중심의 풍부하고 고소한 맛'],
+  ['샤를 에드시크 브뤼 리저브','Charles Heidsieck Brut Réserve',3,'프랑스 샹파뉴','깊고 고소한 숙성 향이 매력적이에요'],
+  ['뤼나르 블랑 드 블랑','Ruinart Blanc de Blancs',3,'프랑스 샹파뉴','샤르도네 100%의 맑고 우아한 샴페인'],
+  ['빌카르 살몽 브뤼 로제','Billecart-Salmon Brut Rosé',3,'프랑스 샹파뉴','연어빛의 섬세한 로제 샴페인'],
+  ['돔 페리뇽','Dom Pérignon',3,'프랑스 샹파뉴','빈티지 샴페인의 상징, 최고의 선물용']],
+ 'moscato':[
+  ['미켈레 키아를로 니볼레','Michele Chiarlo Nivole Moscato d\'Asti',1,'이탈리아 피에몬테','작은 병도 있는 달콤한 모스카토 다스티'],
+  ['사라코 모스카토 다스티','Saracco Moscato d\'Asti',1,'이탈리아 피에몬테','복숭아와 꽃향기가 가득한 모스카토'],
+  ['컵케이크 모스카토 다스티','Cupcake Moscato d\'Asti',1,'이탈리아 피에몬테','달콤하고 가볍게 즐기는 디저트 와인'],
+  ['바르테누라 모스카토','Bartenura Moscato',1,'이탈리아 파비아','파란 병으로 유명한 달콤한 모스카토 (다스티는 아니에요)'],
+  ['체레토 모스카토 다스티','Ceretto I Vignaioli di Santo Stefano Moscato d\'Asti',2,'이탈리아 피에몬테','섬세한 단맛의 고급 모스카토 다스티'],
+  ['비에티 카시네타','Vietti Cascinetta Moscato d\'Asti',2,'이탈리아 피에몬테','명가 비에티의 우아한 모스카토']],
+ 'brachetto':[
+  ['반피 로사 레갈레','Banfi Rosa Regale Brachetto d\'Acqui',2,'이탈리아 피에몬테','장미와 딸기 향의 달콤한 붉은 스파클링'],
+  ['브라이다 브라케토 다퀴','Braida Brachetto d\'Acqui',2,'이탈리아 피에몬테','라즈베리 향이 나는 가벼운 디저트 와인'],
+  ['마렌코 피네토','Marenco Pineto Brachetto d\'Acqui',2,'이탈리아 피에몬테','장미 향이 풍부한 브라케토']],
+ 'port':[
+  ['샌드맨 파운더스 리저브','Sandeman Founders Reserve Port',1,'포르투갈 도우루','검은 망토 신사 라벨의 루비 포트'],
+  ['다우스 파인 토니','Dow\'s Fine Tawny Port',1,'포르투갈 도우루','캐러멜과 견과 향의 가벼운 토니 포트'],
+  ['콕번스 스페셜 리저브','Cockburn\'s Special Reserve Port',1,'포르투갈 도우루','진한 베리 맛의 대중적인 포트'],
+  ['그레이엄스 식스 그레이프스','Graham\'s Six Grapes Reserve Port',2,'포르투갈 도우루','진하고 달콤한 리저브 루비 포트'],
+  ['폰세카 빈 27','Fonseca Bin 27 Port',2,'포르투갈 도우루','블랙베리와 초콜릿 향의 인기 포트'],
+  ['테일러스 10년 토니','Taylor Fladgate 10 Year Old Tawny Port',2,'포르투갈 도우루','10년 숙성의 견과·캐러멜 향'],
+  ['그레이엄스 10년 토니','Graham\'s 10 Year Old Tawny Port',2,'포르투갈 도우루','부드럽고 고소한 10년 토니'],
+  ['워레스 오티마 10','Warre\'s Otima 10 Year Old Tawny Port',2,'포르투갈 도우루','가볍고 우아한 10년 토니'],
+  ['테일러스 20년 토니','Taylor Fladgate 20 Year Old Tawny Port',3,'포르투갈 도우루','20년 숙성의 깊고 복합적인 맛'],
+  ['샌드맨 20년 토니','Sandeman 20 Year Old Tawny Port',3,'포르투갈 도우루','오랜 숙성의 말린 과일과 견과 향']],
+ 'beaujolais':[
+  ['조르주 뒤뵈프 보졸레 빌라주','Georges Duboeuf Beaujolais-Villages',1,'프랑스 보졸레','꽃 라벨로 유명한 가볍고 상큼한 보졸레'],
+  ['루이 자도 보졸레 빌라주','Louis Jadot Beaujolais-Villages',1,'프랑스 보졸레','딸기 향이 산뜻한 데일리 레드'],
+  ['샤토 데 자크 물랭 아 방','Louis Jadot Château des Jacques Moulin-à-Vent',2,'프랑스 보졸레 물랭 아 방','보졸레 중에서 가장 진하고 구조감 있는 마을'],
+  ['마르셀 라피에르 모르공','Marcel Lapierre Morgon',2,'프랑스 보졸레 모르공','내추럴 와인의 선구자가 만든 생기 있는 모르공'],
+  ['장 푸아야르 모르공','Jean Foillard Morgon Côte du Py',3,'프랑스 보졸레 모르공','깊이 있는 고급 보졸레 크뤼']],
+ 'barolo':[
+  ['G.D. 바이라 랑게 네비올로','G.D. Vajra Langhe Nebbiolo',2,'이탈리아 피에몬테 랑게','바롤로의 맛을 가볍게 먼저 느끼기 좋아요'],
+  ['프로두토리 델 바르바레스코','Produttori del Barbaresco Barbaresco',3,'이탈리아 피에몬테 바르바레스코','협동조합이 만든 품질 좋은 정통 바르바레스코'],
+  ['폰타나프레다 바롤로 세랄룽가','Fontanafredda Barolo Serralunga d\'Alba',3,'이탈리아 피에몬테 바롤로','힘 있고 구조감 있는 클래식 바롤로'],
+  ['피오 체사레 바롤로','Pio Cesare Barolo',3,'이탈리아 피에몬테 바롤로','오랜 명가의 균형 잡힌 바롤로'],
+  ['프루노토 바롤로','Prunotto Barolo',3,'이탈리아 피에몬테 바롤로','장미와 체리 향이 우아한 바롤로'],
+  ['미켈레 키아를로 바롤로 토르토니아노','Michele Chiarlo Barolo Tortoniano',3,'이탈리아 피에몬테 바롤로','부드럽게 다듬어진 현대적인 바롤로'],
+  ['마르케지 디 바롤로 트라디치오네','Marchesi di Barolo Barolo Tradizione',3,'이탈리아 피에몬테 바롤로','바롤로라는 이름을 처음 알린 전통 명가'],
+  ['비에티 바롤로 카스틸리오네','Vietti Barolo Castiglione',3,'이탈리아 피에몬테 바롤로','여러 마을 포도를 섞은 균형 좋은 바롤로']],
+ 'rhone':[
+  ['기갈 코트 뒤 론 루즈','E. Guigal Côtes du Rhône Rouge',1,'프랑스 론','론 와인의 기준으로 불리는 가성비 레드'],
+  ['페랭 레제르브 코트 뒤 론','Famille Perrin Réserve Côtes du Rhône',1,'프랑스 론','라즈베리와 후추 향의 부드러운 레드'],
+  ['샤푸티에 벨루슈 코트 뒤 론','M. Chapoutier Belleruche Côtes-du-Rhône',1,'프랑스 론','점자 라벨로 유명한 친근한 론 레드'],
+  ['폴 자불레 에네 파라렐 45','Paul Jaboulet Aîné Parallèle 45 Côtes du Rhône',1,'프랑스 론','북위 45도에서 이름을 딴 데일리 론 레드'],
+  ['기갈 크로즈 에르미타주','E. Guigal Crozes-Hermitage',2,'프랑스 북부 론','시라 100%의 후추 향 나는 레드'],
+  ['도멘 뒤 비유 텔레그라프','Domaine du Vieux Télégraphe Châteauneuf-du-Pape',3,'프랑스 남부 론 샤토뇌프 뒤 파프','힘 있고 따뜻한 정통 샤토뇌프'],
+  ['샤토 드 보카스텔','Château de Beaucastel Châteauneuf-du-Pape',3,'프랑스 남부 론 샤토뇌프 뒤 파프','13가지 품종을 모두 쓰는 것으로 유명한 명가']],
+ 'bordeaux':[
+  ['무통 카데 루즈','Mouton Cadet Rouge',1,'프랑스 보르도','무통 로칠드 가문이 만든 대중적인 보르도'],
+  ['샤토 그레이삭','Château Greysac',2,'프랑스 보르도 메독','클래식한 메독 스타일의 가성비 보르도'],
+  ['샤토 캉트메를','Château Cantemerle',2,'프랑스 보르도 오 메독','부드럽고 우아한 그랑 크뤼 클라세'],
+  ['샤토 글로리아','Château Gloria',2,'프랑스 보르도 생 쥘리앵','값 대비 품질이 뛰어난 생 쥘리앵'],
+  ['샤토 탈보','Château Talbot',3,'프랑스 보르도 생 쥘리앵','진하고 구조감 있는 생 쥘리앵 그랑 크뤼'],
+  ['샤토 린치 바주','Château Lynch-Bages',3,'프랑스 보르도 포이야크','풍부한 블랙커런트 향의 인기 포이야크'],
+  ['샤토 코스 데스투르넬','Château Cos d\'Estournel',3,'프랑스 보르도 생테스테프','동양풍 건물로 유명한 생테스테프 명가']],
+ 'ribera':[
+  ['프로토스 크리안사','Protos Crianza',2,'스페인 리베라 델 두에로','진한 과일과 오크의 균형'],
+  ['에밀리오 모로','Emilio Moro',2,'스페인 리베라 델 두에로','블랙베리와 감초 향의 힘 있는 레드'],
+  ['틴토 페스케라 크리안사','Tinto Pesquera Crianza',2,'스페인 리베라 델 두에로','리베라를 세계에 알린 대표 와인'],
+  ['파고 데 카라오베하스','Pago de Carraovejas',3,'스페인 리베라 델 두에로','세련되고 진한 고급 리베라'],
+  ['베가 시실리아 우니코','Vega Sicilia Único',3,'스페인 리베라 델 두에로','스페인 최고의 와인으로 꼽히는 전설적인 레드']],
+ 'carmenere':[
+  ['카시예로 델 디아블로 카르메네르','Casillero del Diablo Carmenere',1,'칠레 센트럴 밸리','블랙베리와 후추 향의 가성비 카르메네르'],
+  ['라포스톨 그랑 셀렉션 카르메네르','Lapostolle Grand Selection Carmenère',1,'칠레 라펠 밸리','부드러운 과일 맛의 데일리 카르메네르'],
+  ['마르케스 데 카사 콘차 카르메네르','Marques de Casa Concha Carmenere',2,'칠레 페우모','진하고 향신료 향이 풍부해요'],
+  ['몬테스 알파 카르메네르','Montes Alpha Carmenere',2,'칠레 콜차과 밸리','오크 숙성의 진하고 부드러운 맛']],
+ 'amarone':[
+  ['마시 캄포피오린','Masi Campofiorin',2,'이탈리아 베네토','말린 포도로 맛을 더한 "베이비 아마로네"'],
+  ['제나토 리파사','Zenato Ripassa Valpolicella Ripasso Superiore',2,'이탈리아 베네토','체리와 초콜릿 향의 진한 리파소'],
+  ['마시 코스타세라 아마로네','Masi Costasera Amarone Classico',3,'이탈리아 베네토','건포도와 초콜릿 향의 대표 아마로네'],
+  ['알레그리니 아마로네','Allegrini Amarone della Valpolicella Classico',3,'이탈리아 베네토','풍부하고 벨벳 같은 질감'],
+  ['제나토 아마로네','Zenato Amarone della Valpolicella Classico',3,'이탈리아 베네토','진하고 묵직한 정통 아마로네'],
+  ['톰마시 아마로네','Tommasi Amarone della Valpolicella Classico',3,'이탈리아 베네토','오랜 가족 명가의 클래식 아마로네']],
+ 'brunello':[
+  ['반피 로소 디 몬탈치노','Castello Banfi Rosso di Montalcino',2,'이탈리아 토스카나 몬탈치노','브루넬로의 맛을 가볍게 즐기는 동생 와인'],
+  ['카스텔로 반피 브루넬로','Castello Banfi Brunello di Montalcino',3,'이탈리아 토스카나 몬탈치노','체리와 가죽 향의 대표 브루넬로'],
+  ['콜 도르치아 브루넬로','Col d\'Orcia Brunello di Montalcino',3,'이탈리아 토스카나 몬탈치노','전통 방식의 우아한 브루넬로'],
+  ['프레스코발디 카스텔조콘도 브루넬로','Frescobaldi CastelGiocondo Brunello di Montalcino',3,'이탈리아 토스카나 몬탈치노','명가 프레스코발디의 진한 브루넬로'],
+  ['비온디 산티 브루넬로','Biondi-Santi Brunello di Montalcino',3,'이탈리아 토스카나 몬탈치노','브루넬로를 처음 만든 전설적인 명가']],
+ 'sancerre':[
+  ['파스칼 졸리베 상세르','Pascal Jolivet Sancerre',2,'프랑스 루아르 상세르','시트러스와 미네랄의 깔끔한 상세르'],
+  ['앙리 부르주아 상세르','Henri Bourgeois Sancerre Les Baronnes',2,'프랑스 루아르 상세르','자몽 향과 짭조름한 미네랄'],
+  ['조셉 멜로 상세르','Joseph Mellot Sancerre La Chatellenie',2,'프랑스 루아르 상세르','산뜻하고 균형 잡힌 상세르'],
+  ['라두세트 푸이 퓌메','de Ladoucette Pouilly-Fumé',3,'프랑스 루아르 푸이 퓌메','부싯돌 향이 나는 우아한 푸이 퓌메']],
+ 'albarino':[
+  ['마르틴 코닥스 알바리뇨','Martín Códax Albariño',1,'스페인 리아스 바이샤스','복숭아와 레몬 향의 대표 알바리뇨'],
+  ['부르간스 알바리뇨','Burgáns Albariño',1,'스페인 리아스 바이샤스','상큼하고 가벼운 가성비 알바리뇨'],
+  ['파코 앤 롤라','Paco & Lola Albariño',1,'스페인 리아스 바이샤스','물방울무늬 병의 산뜻한 알바리뇨'],
+  ['마르 데 프라데스','Mar de Frades Albariño',2,'스페인 리아스 바이샤스','파란 병의 짭조름하고 상큼한 맛'],
+  ['파소 데 세뇨란스','Pazo de Señorans Albariño',2,'스페인 리아스 바이샤스','섬세하고 풍부한 고급 알바리뇨']],
+ 'gruner':[
+  ['도메네 바하우 그뤼너 펠트리너 페더슈필','Domäne Wachau Grüner Veltliner Federspiel',1,'오스트리아 바하우','청사과와 후추 향의 깔끔한 그뤼너'],
+  ['로렌츠 파이브 싱잉 그뤼너','Laurenz V. Singing Grüner Veltliner',1,'오스트리아','가볍고 상큼한 입문용 그뤼너'],
+  ['로이머 로이스 그뤼너 펠트리너','Loimer Lois Grüner Veltliner',1,'오스트리아 니더외스터라이히','산뜻한 산미와 허브 향'],
+  ['히르슈 그뤼너 펠트리너 #1','Hirsch Grüner Veltliner #1',1,'오스트리아 캄프탈','상쾌하고 깔끔한 데일리 그뤼너']],
+ 'gewurz':[
+  ['위겔 게뷔르츠트라미너','Hugel Gewurztraminer',2,'프랑스 알자스','리치와 장미 향의 대표 알자스 와인'],
+  ['트림바크 게뷔르츠트라미너','Trimbach Gewurztraminer',2,'프랑스 알자스','향이 풍부하면서 깔끔하게 끝나는 스타일'],
+  ['진트 훔브레히트 게뷔르츠트라미너','Domaine Zind-Humbrecht Gewurztraminer',3,'프랑스 알자스','진하고 풍성한 고급 게뷔르츠'],
+  ['바인바흐 게뷔르츠트라미너','Domaine Weinbach Gewurztraminer',3,'프랑스 알자스','우아하고 향긋한 알자스 명가의 와인']],
+ 'chenin':[
+  ['켄 포레스터 올드 바인 리저브 슈냉 블랑','Ken Forrester Old Vine Reserve Chenin Blanc',1,'남아공 스텔렌보스','사과와 꿀 향의 풍부한 남아공 슈냉'],
+  ['샹팔루 부브레','Champalou Vouvray',2,'프랑스 루아르 부브레','살짝 단맛과 산미의 균형'],
+  ['마크 브레디프 부브레','Marc Brédif Vouvray',2,'프랑스 루아르 부브레','배와 꿀 향의 부드러운 부브레'],
+  ['도멘 데 보마르 사브니에르','Domaine des Baumard Savennières',2,'프랑스 루아르 사브니에르','드라이하고 미네랄이 강한 슈냉'],
+  ['도멘 위에 부브레','Domaine Huet Vouvray',3,'프랑스 루아르 부브레','슈냉 블랑의 최고 명가 중 하나']],
+ 'burg-white':[
+  ['조셉 드루앵 마콩 빌라주','Joseph Drouhin Mâcon-Villages',1,'프랑스 부르고뉴 마코네','산뜻하고 깔끔한 데일리 부르고뉴 화이트'],
+  ['루이 자도 부르고뉴 샤르도네','Louis Jadot Bourgogne Chardonnay',2,'프랑스 부르고뉴','사과와 레몬 향의 기본 부르고뉴 화이트'],
+  ['올리비에 를레브 부르고뉴 블랑','Olivier Leflaive Bourgogne Blanc Les Sétilles',2,'프랑스 부르고뉴','섬세하고 우아한 부르고뉴 블랑'],
+  ['루이 라투르 푸이 퓌세','Louis Latour Pouilly-Fuissé',2,'프랑스 부르고뉴 푸이 퓌세','풍부하고 고소한 맛의 푸이 퓌세'],
+  ['루이 자도 푸이 퓌세','Louis Jadot Pouilly-Fuissé',2,'프랑스 부르고뉴 푸이 퓌세','과일과 미네랄의 균형'],
+  ['부샤르 페르 에 피스 뫼르소','Bouchard Père & Fils Meursault',3,'프랑스 부르고뉴 뫼르소','헤이즐넛과 버터 향의 풍부한 뫼르소']],
+ 'sauternes':[
+  ['카름 드 리외섹','Carmes de Rieussec',2,'프랑스 보르도 소테른','리외섹의 세컨드 와인, 부담 없는 소테른'],
+  ['샤토 기로','Château Guiraud',3,'프랑스 보르도 소테른','살구와 꿀 향의 우아한 소테른'],
+  ['샤토 쉬뒤로','Château Suduiraut',3,'프랑스 보르도 소테른','진하고 풍부한 1등급 소테른'],
+  ['샤토 리외섹','Château Rieussec',3,'프랑스 보르도 소테른','라피트 로칠드 가문의 소테른'],
+  ['샤토 디켐','Château d\'Yquem',3,'프랑스 보르도 소테른','세계 최고의 스위트 와인으로 꼽히는 전설']],
+ 'icewine':[
+  ['필러 에스테이트 비달 아이스와인','Peller Estates Vidal Icewine',2,'캐나다 온타리오','열대 과일과 꿀 향의 아이스와인'],
+  ['이니스킬린 비달 아이스와인','Inniskillin Vidal Icewine',3,'캐나다 온타리오 나이아가라','아이스와인을 세계에 알린 대표 와인'],
+  ['이니스킬린 리슬링 아이스와인','Inniskillin Riesling Icewine',3,'캐나다 온타리오 나이아가라','상큼한 산미가 살아 있는 리슬링 아이스와인']],
+ 'cremant':[
+  ['그라티앵 에 메이에르 크레망 드 루아르','Gratien & Meyer Crémant de Loire Brut',1,'프랑스 루아르','사과 향의 깔끔한 가성비 크레망'],
+  ['뤼시앵 알브레히트 크레망 달자스 로제','Lucien Albrecht Crémant d\'Alsace Brut Rosé',1,'프랑스 알자스','피노 누아로 만든 상큼한 로제 크레망'],
+  ['랑글루아 샤토 크레망 드 루아르','Langlois-Château Crémant de Loire Brut',2,'프랑스 루아르','섬세한 거품의 우아한 크레망'],
+  ['JCB No. 21 크레망 드 부르고뉴','JCB No. 21 Crémant de Bourgogne',2,'프랑스 부르고뉴','부르고뉴 품종으로 만든 세련된 크레망']],
+ 'lambrusco':[
+  ['리유니테 람브루스코','Riunite Lambrusco',1,'이탈리아 에밀리아로마냐','달콤하고 가벼운 대중적인 람브루스코'],
+  ['클레토 키아르리 베키아 모데나','Cleto Chiarli Vecchia Modena Lambrusco di Sorbara',1,'이탈리아 에밀리아로마냐','드라이하고 상큼한 정통 람브루스코'],
+  ['메디치 에르메테 콘체르토','Medici Ermete Concerto Lambrusco Reggiano',1,'이탈리아 에밀리아로마냐','드라이하고 진한 과일 맛의 람브루스코']],
+ 'us-sparkling':[
+  ['그루에 브뤼','Gruet Brut',1,'미국 뉴멕시코','가성비 좋은 미국 전통 방식 스파클링'],
+  ['도멘 샹동 브뤼','Domaine Chandon Brut',2,'미국 캘리포니아','모엣 샹동이 세운 캘리포니아 스파클링'],
+  ['로드레 에스테이트 브뤼','Roederer Estate Brut',2,'미국 캘리포니아 앤더슨 밸리','샴페인 명가 루이 로드레의 캘리포니아 와인'],
+  ['멈 나파 브뤼 프레스티지','Mumm Napa Brut Prestige',2,'미국 캘리포니아 나파 밸리','과일 향이 생기 있는 나파 스파클링'],
+  ['슈람스버그 블랑 드 블랑','Schramsberg Blanc de Blancs',2,'미국 캘리포니아 노스 코스트','백악관 만찬에도 쓰인 우아한 스파클링']]
 };
 const TIER={1:'부담 없이',2:'적당히',3:'특별한 날'};
 
@@ -1286,10 +1637,10 @@ function wineCard(w,why,i,budget){
   const P=PRICE[settings.currency];
   const list=(PRODUCTS[w.id]||[]).slice().sort((a,b)=>(budget?(a[2]==budget?0:1)-(b[2]==budget?0:1):0)||a[2]-b[2]);
   return `<article class="wine">
-   <div class="whead"><div class="g">${glass(w.type,36)}</div><div><div class="rank">추천 ${i+1}</div><h3 style="font-size:19px">${esc(w.name)}</h3><span class="chip">${TYPES[w.type].label}</span><span class="chip gray">${esc(w.grape)}</span></div></div>
+   <div class="whead"><div class="g">${glass(w.type,36)}</div><div>${i!=null?`<div class="rank">추천 ${i+1}</div>`:''}<h3 style="font-size:19px">${esc(w.name)}</h3><span class="chip">${TYPES[w.type].label}</span><span class="chip gray">${esc(w.grape)}</span></div></div>
    <div class="wbody">
      <p>${esc(w.desc)}</p>
-     <div class="why"><b class="small" style="color:var(--wine3)">이래서 골랐어요</b>${why.map(x=>`<div>· ${esc(x)}</div>`).join('')}</div>
+     ${why&&why.length?`<div class="why"><b class="small" style="color:var(--wine3)">이래서 골랐어요</b>${why.map(x=>`<div>· ${esc(x)}</div>`).join('')}</div>`:''}
      ${tasteBlock(w)}
      <dl class="kv"><dt>향</dt><dd>${esc(w.aroma)}</dd><dt>잘 맞는 음식</dt><dd>${w.food.filter(f=>FOODSHORT[f]).map(f=>FOODSHORT[f]).join(', ')}</dd><dt>가격대</dt><dd>${w.price.map(p=>P[p]).join(' / ')}</dd><dt>마시는 온도</dt><dd>${esc(w.temp)}</dd></dl>
      ${list.length?`<div class="prods"><div class="prods-h">🍷 이런 제품을 찾아보세요 <span>${list.length}개</span></div>${list.map(x=>`<div class="prod"><div class="pn"><b>${esc(x[0])}</b><small>${esc(x[1])}</small></div><div class="pr"><span class="tier t${x[2]}${budget&&x[2]==budget?' fit':''}">${TIER[x[2]]}</span><a href="https://www.google.com/search?q=${encodeURIComponent(x[1]+' wine')}" target="_blank" rel="noopener">검색 ↗</a></div></div>`).join('')}<div class="prods-note">가게마다 없을 수 있고, 빈티지와 가격은 달라요. 영어 이름을 직원에게 보여 주면 찾기 쉬워요.</div></div>`:''}
@@ -1460,10 +1811,10 @@ function openSheet(html,onMount){
 function closeSheet(){const s=$('#scrim');if(s)s.remove();document.body.style.overflow='';}
 function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 
-function openRecord(id,styleId){
+function openRecord(id,styleId,presetName){
   const recs=store.get('records',[]);
   const r=id?recs.find(x=>x.id===id):null;
-  const d=r||{name:styleId&&WMAP[styleId]?WMAP[styleId].name:'',style:styleId||'',date:today(),rating:0,price:'',food:'',memo:''};
+  const d=r||{name:presetName||(styleId&&WMAP[styleId]?WMAP[styleId].name:''),style:styleId||'',date:today(),rating:0,price:'',food:'',memo:''};
   let rating=d.rating||0;
   const groups=Object.keys(TYPES).map(t=>`<optgroup label="${TYPES[t].label}">${WINES.filter(w=>w.type===t).map(w=>`<option value="${w.id}" ${d.style===w.id?'selected':''}>${esc(w.name)}</option>`).join('')}</optgroup>`).join('');
   openSheet(`<h2 style="margin-top:4px">${r?'기록 고치기':'마셔 본 와인 기록'}</h2>
@@ -1531,6 +1882,118 @@ function openRecord(id,styleId){
   });
 }
 
+/* ---------- 검색 ---------- */
+const STYLE_ALIAS={'cab-chile':'카베 cabernet 칠레 chile','cab-cal':'카베 cabernet 나파 napa 캘리포니아 california','pinot':'피노누아 pinotnoir 부르고뉴 burgundy','merlot':'merlot','malbec':'malbec 아르헨티나','shiraz':'시라 syrah shiraz 호주','chianti':'키안티 chianti 산지오베제 sangiovese 토스카나','rioja':'리오하 rioja 템프라니요 tempranillo','zin':'진판델 zinfandel','sb-nz':'소비뇽블랑 sauvignonblanc 뉴질랜드','chard-cal':'샤르도네 chardonnay 버터','chablis':'샤블리 chablis 샤르도네 chardonnay','riesling':'리슬링 riesling 독일','pg':'피노그리지오 pinotgrigio 피노그리 pinotgris','rose':'로제 rose 프로방스 provence','prosecco':'프로세코 prosecco','cava':'카바 cava','champagne':'샴페인 샹파뉴 champagne','moscato':'모스카토 moscato 머스캣 muscat','brachetto':'브라케토 brachetto','port':'포트 port 포르투','beaujolais':'보졸레 beaujolais 가메 gamay 누보 nouveau','barolo':'바롤로 barolo 바르바레스코 barbaresco 네비올로 nebbiolo','rhone':'론 rhone 코트뒤론 샤토뇌프 chateauneuf 그르나슈 grenache 시라 syrah','bordeaux':'보르도 bordeaux 메독 medoc 샤토 chateau 클라레 claret','ribera':'리베라 ribera 템프라니요 tempranillo','carmenere':'카르메네르 carmenere 칠레','amarone':'아마로네 amarone 리파소 ripasso 발폴리첼라 valpolicella','brunello':'브루넬로 brunello 몬탈치노 montalcino 산지오베제 sangiovese','sancerre':'상세르 sancerre 푸이퓌메 pouillyfume 소비뇽블랑 sauvignonblanc 루아르 loire','albarino':'알바리뇨 albarino','gruner':'그뤼너 gruner veltliner 오스트리아','gewurz':'게뷔르츠 gewurztraminer 알자스 alsace','chenin':'슈냉 chenin 부브레 vouvray','burg-white':'부르고뉴 burgundy 샤르도네 chardonnay 뫼르소 meursault 마콩 macon','sauternes':'소테른 sauternes 귀부','icewine':'아이스와인 icewine eiswein','cremant':'크레망 cremant','lambrusco':'람브루스코 lambrusco','us-sparkling':'미국 스파클링 sparkling'};
+const TYPE_WORDS={red:'레드 red 적포도주',white:'화이트 white 백포도주',rose:'로제 rose',sparkling:'스파클링 sparkling 거품 발포',dessert:'디저트 dessert 스위트 sweet'};
+const nrm=s=>String(s==null?'':s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[\s\-·'’.,()\/&!?"“”:#]/g,'');
+const SR_ATTR=[
+ ['food','meat',['고기','스테이크','삼겹살','갈비','소고기','양고기','바비큐','steak','beef','bbq']],
+ ['food','seafood',['해산물','생선','굴','연어','조개','새우','초밥','seafood','fish','회']],
+ ['food','chicken',['치킨','닭','튀김','chicken']],
+ ['food','pizza',['피자','파스타','pizza','pasta']],
+ ['food','spicy',['매운','떡볶이','마라','타코','spicy']],
+ ['food','cheese',['치즈','안주','cheese']],
+ ['food','dessert',['케이크','초콜릿','cake']],
+ ['occ','gift',['선물','gift']],['occ','date',['데이트','기념일']],['occ','party',['파티','모임','party']],['occ','alone',['혼술','혼자']],
+ ['taste','sweet',['달콤','단맛','스위트','sweet','달달']],['taste','dry',['드라이','dry']],['taste','acid',['상큼','산뜻','새콤']],
+ ['taste','heavy',['진한','묵직','풀바디']],['taste','light',['가벼운','라이트','light']],['taste','tannic',['떫은']],['taste','soft',['부드러운']],
+ ['type','red',['레드','red']],['type','white',['화이트','white']],['type','rose',['로제','rose']],['type','sparkling',['스파클링','거품','sparkling']],['type','dessert',['디저트','dessert']],
+ ['price',1,['가성비','저렴','싼','데일리']],['price',3,['고급','비싼','명품','특별한']]
+].map(a=>[a[0],a[1],a[2].map(nrm)]);
+const TASTE_OK={sweet:w=>w.s>=3,dry:w=>w.s<=1,acid:w=>w.a>=4,heavy:w=>w.b>=4,light:w=>w.b<=2,tannic:w=>w.t>=4,soft:w=>w.type==='red'&&w.t<=2};
+let SRIDX=null,SRQ='';
+function buildSearchIndex(){
+  const styles=WINES.map(w=>({w,ix:nrm([w.name,w.grape,w.aroma,w.desc,w.ex,TYPES[w.type].label,TYPE_WORDS[w.type],STYLE_ALIAS[w.id]||''].join(' ')),nm:nrm(w.name)}));
+  const prods=[];WINES.forEach(w=>(PRODUCTS[w.id]||[]).forEach(p=>prods.push({p,w,nm:nrm(p[0]+' '+p[1]),ix:nrm([p[0],p[1],p[3],p[4],w.name,w.grape,TYPE_WORDS[w.type],STYLE_ALIAS[w.id]||''].join(' '))})));
+  const strip=h=>String(h).replace(/<[^>]+>/g,' ');
+  const learn=[];LEVELS.forEach(l=>l.cards.forEach((c,i)=>learn.push({l,i,c,ix:nrm([c.k,c.t,strip(c.b),strip(c.tip)].join(' '))})));
+  SRIDX={styles,prods,learn};
+}
+function parseQuery(q){
+  const toks=q.trim().split(/\s+/).filter(Boolean),attrs=[],texts=[];
+  toks.forEach(tk=>{const n=nrm(tk);if(!n)return;let hit=null;
+    for(const a of SR_ATTR){if(a[2].some(wd=>n===wd||(wd.length>=2&&n.startsWith(wd)))){hit=a;break;}}
+    if(hit)attrs.push(hit);else texts.push(n);});
+  return {attrs,texts};
+}
+function styleOkAttrs(w,attrs,tier){
+  return attrs.every(([k,v])=>k==='food'?w.food.includes(v):k==='occ'?w.occ.includes(v):k==='taste'?TASTE_OK[v](w):k==='type'?w.type===v:k==='price'?(tier!=null?tier===v:w.price.includes(v)):true);
+}
+function runSearch(q){
+  if(!SRIDX)buildSearchIndex();
+  const {attrs,texts}=parseQuery(q);if(!attrs.length&&!texts.length)return null;
+  const tm=ix=>texts.every(t=>ix.includes(t));
+  const score=(nm)=>texts.length?(nm.startsWith(texts[0])?3:nm.includes(texts[0])?2:0):0;
+  const styles=SRIDX.styles.filter(s=>tm(s.ix)&&styleOkAttrs(s.w,attrs)).sort((a,b)=>score(b.nm)-score(a.nm));
+  const prods=SRIDX.prods.filter(s=>tm(s.ix)&&styleOkAttrs(s.w,attrs,s.p[2])).sort((a,b)=>score(b.nm)-score(a.nm)||a.p[2]-b.p[2]);
+  const learn=texts.length&&!attrs.length?SRIDX.learn.filter(s=>tm(s.ix)):[];
+  const recs=texts.length?store.get('records',[]).filter(r=>tm(nrm([r.name,r.memo,r.food,(WMAP[r.style]||{}).name].join(' ')))):[];
+  return {styles,prods,learn,recs};
+}
+const SR_SUGGEST=['샤르도네','피노 누아','쉬라즈','샴페인','치킨','선물','달콤한','가성비 레드','회','Kim Crawford'];
+const srIcon='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
+const extLinks=q=>`<div class="sr-ext"><a class="btn ghost" href="https://www.vivino.com/search/wines?q=${encodeURIComponent(q)}" target="_blank" rel="noopener">Vivino에서 찾기 ↗</a><a class="btn ghost" href="https://www.google.com/search?q=${encodeURIComponent(q+' wine')}" target="_blank" rel="noopener">구글에서 찾기 ↗</a></div>`;
+function openSearch(){
+  openSheet(`<div id="srWrap"></div>`,s=>{s.querySelector('.sheet').classList.add('tall');srHome(s);});
+}
+function srHome(s){
+  const wrap=s.querySelector('#srWrap');
+  wrap.innerHTML=`<h2 style="margin-top:4px">와인 찾기</h2>
+   <div class="sr-box">${srIcon}<input type="search" id="srQ" placeholder="와인 이름, 품종, 음식으로 찾기" autocomplete="off" enterkeyhint="search" value="${esc(SRQ)}"></div>
+   <div id="srRes"></div>`;
+  const inp=wrap.querySelector('#srQ'),res=wrap.querySelector('#srRes');let tmr=null,more=20;
+  const draw=()=>{
+    const q=inp.value;SRQ=q;const r=runSearch(q);
+    if(!r){res.innerHTML=`<div class="sr-hint">이렇게 찾아보세요</div><div class="sr-chips">${SR_SUGGEST.map(x=>`<button type="button" data-q="${esc(x)}">${esc(x)}</button>`).join('')}</div>
+      <p class="small muted" style="margin-top:14px">한글·영어 모두 돼요. 품종, 나라, 음식(치킨, 회), 자리(선물, 데이트), 맛(달콤한, 상큼한)으로도 찾을 수 있어요.</p>`;
+      res.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{inp.value=b.dataset.q;more=20;draw();});return;}
+    const n=r.styles.length+r.prods.length+r.learn.length+r.recs.length;
+    let h='';
+    if(!n){h=`<div class="sr-empty"><b>"${esc(q)}"</b>에 맞는 와인이 앱에 없어요.<br>아래에서 더 찾아볼 수 있어요.</div>`+extLinks(q);res.innerHTML=h;return;}
+    if(r.styles.length)h+=`<div class="sr-sec"><h3>와인 스타일 <span>${r.styles.length}</span></h3>${r.styles.map(x=>`<button class="sr-row" data-k="s:${x.w.id}"><span class="g">${glass(x.w.type,22)}</span><span class="tx"><b>${esc(x.w.name)}</b><small>${esc(x.w.grape)} · ${TYPES[x.w.type].label}</small></span>${chev}</button>`).join('')}</div>`;
+    if(r.prods.length)h+=`<div class="sr-sec"><h3>제품 <span>${r.prods.length}</span></h3>${r.prods.slice(0,more).map((x,i)=>`<button class="sr-row" data-k="p:${SRIDX.prods.indexOf(x)}"><span class="g">${glass(x.w.type,22)}</span><span class="tx"><b>${esc(x.p[0])}</b><small><i>${esc(x.p[1])}</i></small><small>${esc(x.p[3])}</small></span><span class="tier t${x.p[2]}">${TIER[x.p[2]]}</span></button>`).join('')}${r.prods.length>more?`<button class="btn ghost block" id="srMore" style="margin-top:8px">제품 더 보기 (${r.prods.length-more}개 더)</button>`:''}</div>`;
+    if(r.learn.length)h+=`<div class="sr-sec"><h3>배우기 카드 <span>${r.learn.length}</span></h3>${r.learn.map(x=>`<button class="sr-row" data-k="l:${x.l.id}:${x.i}"><span class="g lv">${x.l.name}</span><span class="tx"><b>${esc(x.c.t)}</b><small>${esc(x.c.k)}</small></span>${chev}</button>`).join('')}</div>`;
+    if(r.recs.length)h+=`<div class="sr-sec"><h3>내 기록 <span>${r.recs.length}</span></h3>${r.recs.map(x=>`<button class="sr-row" data-k="r:${esc(x.id)}"><span class="g">🍷</span><span class="tx"><b>${esc(x.name)}</b><small class="stars">${stars(x.rating||0)}</small></span>${chev}</button>`).join('')}</div>`;
+    h+=`<div class="sr-foot">찾는 와인이 없나요?</div>`+extLinks(q);
+    res.innerHTML=h;
+    const mb=res.querySelector('#srMore');if(mb)mb.onclick=()=>{more+=30;draw();};
+    res.querySelectorAll('.sr-row').forEach(b=>b.onclick=()=>srOpen(s,b.dataset.k));
+  };
+  inp.addEventListener('input',()=>{clearTimeout(tmr);more=20;tmr=setTimeout(draw,120);});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();inp.blur();}});
+  draw();
+  if(!SRQ)setTimeout(()=>{try{inp.focus();}catch(e){}},250);
+}
+function srOpen(s,k){
+  const [kind,a,b]=k.split(':');
+  if(kind==='l'){closeSheet();S.level=a;store.set('level',a);LQ=null;go('learn');setTimeout(()=>{const el=$('#lc'+b);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},350);return;}
+  if(kind==='r'){closeSheet();openRecord(a);return;}
+  const wrap=s.querySelector('#srWrap');const sh=s.querySelector('.sheet');
+  const back=`<button class="back sr-back" id="srBack"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg>검색 결과</button>`;
+  if(kind==='s'){
+    const w=WMAP[a];wrap.innerHTML=back+wineCard(w,[],null,0);
+    wrap.querySelector('[data-rec]').onclick=()=>{closeSheet();openRecord(null,w.id);};
+  }else{
+    const x=SRIDX.prods[+a],p=x.p,w=x.w,P=PRICE[settings.currency];
+    wrap.innerHTML=back+`<article class="wine sr-prod">
+     <div class="whead"><div class="g">${glass(w.type,36)}</div><div><h3 style="font-size:19px">${esc(p[0])}</h3><div class="en" style="margin:0">${esc(p[1])}</div></div></div>
+     <div class="wbody">
+      <span class="chip">${TYPES[w.type].label}</span><span class="chip gray">${esc(p[3])}</span><span class="tier t${p[2]}">${TIER[p[2]]}</span>
+      <p style="margin-top:10px;font-size:16px">${esc(p[4])}</p>
+      <div class="sr-style"><div class="small muted">이 와인의 스타일</div><b>${esc(w.name)}</b> <span class="small muted">· ${esc(w.grape)}</span><p class="small" style="margin:6px 0 10px">${esc(w.desc)}</p>${tasteBlock(w)}
+       <dl class="kv"><dt>향</dt><dd>${esc(w.aroma)}</dd><dt>잘 맞는 음식</dt><dd>${w.food.filter(f=>FOODSHORT[f]).map(f=>FOODSHORT[f]).join(', ')}</dd><dt>마시는 온도</dt><dd>${esc(w.temp)}</dd></dl>
+       <button class="link" id="srToStyle" style="padding:0">${esc(w.name)} 자세히 보기 ›</button></div>
+      <div class="ask">🗣️ 가게에서: "<b>${esc(p[1])}</b> 있나요?" 영어 이름을 보여 주면 찾기 쉬워요.</div>
+      ${extLinks(p[1])}
+      <button class="btn soft block" id="srRec" style="margin-top:10px">마셔 봤어요 · 기록하기</button>
+      <p class="small muted" style="margin-top:10px">가게마다 없을 수 있고, 빈티지와 가격은 달라요.</p>
+     </div></article>`;
+    wrap.querySelector('#srRec').onclick=()=>{closeSheet();openRecord(null,w.id,p[0]);};
+    wrap.querySelector('#srToStyle').onclick=()=>srOpen(s,'s:'+w.id);
+  }
+  wrap.querySelector('#srBack').onclick=()=>{srHome(s);sh.scrollTop=0;};
+  sh.scrollTop=0;
+}
 function openSettings(){
   openSheet(`<h2 style="margin-top:4px">설정</h2><div class="card" style="margin-top:8px">
   <div class="field" style="margin-top:0"><label>가격 단위</label><div class="seg" id="cur"><button type="button" data-c="KRW" class="${settings.currency==='KRW'?'on':''}">원 (₩)</button><button type="button" data-c="USD" class="${settings.currency==='USD'?'on':''}">달러 ($)</button></div></div></div>
@@ -1585,10 +2048,11 @@ let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('sh
 /* ---------- 시작 ---------- */
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b&&!b.closest('.sheet')){e.preventDefault();if(b.dataset.go==='pick'&&S.tab==='pick'&&!S.quiz&&!store.get('lastResult',null)){}go(b.dataset.go);}});
 $('#settingsBtn').onclick=openSettings;
+$('#searchBtn').onclick=openSearch;
 S.level=store.get('level','basic')||'basic';
 function fromHash(){const h=(location.hash||'').slice(1);if(['home','learn','pick','log'].includes(h)){S.tab=h;}}
 /* ---------- CocktailPick 연결 ---------- */
-const APP_VERSION='1.0.0',APP_DATE='2026.11.22';
+const APP_VERSION='1.1.0',APP_DATE='2026.11.22';
 const SHARE_URL='https://bit.ly/winepick'; // 친구에게 보내는 주소 (Bitly)
 const QR_SVG="<svg viewBox=\"-2 -2 33 33\" width=\"100%\" height=\"100%\" shape-rendering=\"crispEdges\" aria-label=\"WinePick QR \ucf54\ub4dc\"><rect x=\"-2\" y=\"-2\" width=\"33\" height=\"33\" fill=\"#fff\"/><path d=\"M2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM5 2h1v1h-1zM6 2h1v1h-1zM7 2h1v1h-1zM8 2h1v1h-1zM13 2h1v1h-1zM14 2h1v1h-1zM15 2h1v1h-1zM18 2h1v1h-1zM20 2h1v1h-1zM21 2h1v1h-1zM22 2h1v1h-1zM23 2h1v1h-1zM24 2h1v1h-1zM25 2h1v1h-1zM26 2h1v1h-1zM2 3h1v1h-1zM8 3h1v1h-1zM11 3h1v1h-1zM15 3h1v1h-1zM16 3h1v1h-1zM17 3h1v1h-1zM18 3h1v1h-1zM20 3h1v1h-1zM26 3h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM10 4h1v1h-1zM13 4h1v1h-1zM17 4h1v1h-1zM20 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM26 4h1v1h-1zM2 5h1v1h-1zM4 5h1v1h-1zM5 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h1v1h-1zM11 5h1v1h-1zM12 5h1v1h-1zM15 5h1v1h-1zM16 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM23 5h1v1h-1zM24 5h1v1h-1zM26 5h1v1h-1zM2 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM11 6h1v1h-1zM13 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM23 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM11 7h1v1h-1zM14 7h1v1h-1zM16 7h1v1h-1zM17 7h1v1h-1zM18 7h1v1h-1zM20 7h1v1h-1zM26 7h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1zM4 8h1v1h-1zM5 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM21 8h1v1h-1zM22 8h1v1h-1zM23 8h1v1h-1zM24 8h1v1h-1zM25 8h1v1h-1zM26 8h1v1h-1zM10 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM16 9h1v1h-1zM18 9h1v1h-1zM2 10h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM14 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM21 10h1v1h-1zM22 10h1v1h-1zM23 10h1v1h-1zM24 10h1v1h-1zM9 11h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM13 11h1v1h-1zM16 11h1v1h-1zM18 11h1v1h-1zM21 11h1v1h-1zM25 11h1v1h-1zM2 12h1v1h-1zM6 12h1v1h-1zM8 12h1v1h-1zM9 12h1v1h-1zM10 12h1v1h-1zM12 12h1v1h-1zM13 12h1v1h-1zM14 12h1v1h-1zM17 12h1v1h-1zM18 12h1v1h-1zM22 12h1v1h-1zM23 12h1v1h-1zM25 12h1v1h-1zM26 12h1v1h-1zM3 13h1v1h-1zM4 13h1v1h-1zM7 13h1v1h-1zM9 13h1v1h-1zM18 13h1v1h-1zM19 13h1v1h-1zM20 13h1v1h-1zM26 13h1v1h-1zM2 14h1v1h-1zM6 14h1v1h-1zM8 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM19 14h1v1h-1zM20 14h1v1h-1zM22 14h1v1h-1zM24 14h1v1h-1zM25 14h1v1h-1zM26 14h1v1h-1zM2 15h1v1h-1zM3 15h1v1h-1zM4 15h1v1h-1zM5 15h1v1h-1zM6 15h1v1h-1zM9 15h1v1h-1zM10 15h1v1h-1zM15 15h1v1h-1zM19 15h1v1h-1zM21 15h1v1h-1zM23 15h1v1h-1zM25 15h1v1h-1zM2 16h1v1h-1zM4 16h1v1h-1zM6 16h1v1h-1zM8 16h1v1h-1zM11 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM17 16h1v1h-1zM18 16h1v1h-1zM19 16h1v1h-1zM20 16h1v1h-1zM21 16h1v1h-1zM22 16h1v1h-1zM23 16h1v1h-1zM25 16h1v1h-1zM26 16h1v1h-1zM2 17h1v1h-1zM4 17h1v1h-1zM5 17h1v1h-1zM7 17h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM22 17h1v1h-1zM26 17h1v1h-1zM2 18h1v1h-1zM3 18h1v1h-1zM4 18h1v1h-1zM5 18h1v1h-1zM7 18h1v1h-1zM8 18h1v1h-1zM10 18h1v1h-1zM11 18h1v1h-1zM13 18h1v1h-1zM15 18h1v1h-1zM16 18h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1zM20 18h1v1h-1zM21 18h1v1h-1zM22 18h1v1h-1zM24 18h1v1h-1zM10 19h1v1h-1zM11 19h1v1h-1zM12 19h1v1h-1zM14 19h1v1h-1zM18 19h1v1h-1zM22 19h1v1h-1zM23 19h1v1h-1zM2 20h1v1h-1zM3 20h1v1h-1zM4 20h1v1h-1zM5 20h1v1h-1zM6 20h1v1h-1zM7 20h1v1h-1zM8 20h1v1h-1zM15 20h1v1h-1zM18 20h1v1h-1zM20 20h1v1h-1zM22 20h1v1h-1zM24 20h1v1h-1zM25 20h1v1h-1zM26 20h1v1h-1zM2 21h1v1h-1zM8 21h1v1h-1zM10 21h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM14 21h1v1h-1zM16 21h1v1h-1zM18 21h1v1h-1zM22 21h1v1h-1zM23 21h1v1h-1zM25 21h1v1h-1zM2 22h1v1h-1zM4 22h1v1h-1zM5 22h1v1h-1zM6 22h1v1h-1zM8 22h1v1h-1zM10 22h1v1h-1zM12 22h1v1h-1zM14 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM17 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM21 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM25 22h1v1h-1zM26 22h1v1h-1zM2 23h1v1h-1zM4 23h1v1h-1zM5 23h1v1h-1zM6 23h1v1h-1zM8 23h1v1h-1zM10 23h1v1h-1zM11 23h1v1h-1zM12 23h1v1h-1zM15 23h1v1h-1zM17 23h1v1h-1zM20 23h1v1h-1zM22 23h1v1h-1zM23 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM26 23h1v1h-1zM2 24h1v1h-1zM4 24h1v1h-1zM5 24h1v1h-1zM6 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM13 24h1v1h-1zM14 24h1v1h-1zM15 24h1v1h-1zM18 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM26 24h1v1h-1zM2 25h1v1h-1zM8 25h1v1h-1zM12 25h1v1h-1zM13 25h1v1h-1zM16 25h1v1h-1zM17 25h1v1h-1zM18 25h1v1h-1zM19 25h1v1h-1zM21 25h1v1h-1zM22 25h1v1h-1zM23 25h1v1h-1zM26 25h1v1h-1zM2 26h1v1h-1zM3 26h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM10 26h1v1h-1zM12 26h1v1h-1zM13 26h1v1h-1zM14 26h1v1h-1zM21 26h1v1h-1zM22 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM25 26h1v1h-1zM26 26h1v1h-1z\" fill=\"#22070E\"/></svg>";
 const COCKTAILPICK_URL='https://bit.ly/cocktailpick';
