@@ -369,6 +369,12 @@ main .stats + .medals .medal{color:#FBE3EA}
 .crop-zoom{display:flex;align-items:center;gap:10px;width:min(78vw,340px)}
 .crop-zoom input{flex:1;accent-color:#E0315F}
 .crop-zoom button{width:36px;height:36px;border-radius:50%;border:1px solid rgba(247,199,210,.4);background:rgba(255,255,255,.06);color:#F7C7D2;font-size:20px;line-height:1}
+.pp-img{display:block;width:100%;height:100%;border:0;padding:0;margin:0;background:none;position:relative;cursor:pointer}
+.pp-img img{display:block;width:100%;height:100%;object-fit:cover}
+.pp-pen{position:absolute;right:6px;bottom:6px;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.88);color:#444;display:grid;place-items:center;box-shadow:0 1px 3px rgba(0,0,0,.25);pointer-events:none}
+.crop-more{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px;color:rgba(255,255,255,.45)}
+.crop-more button{border:0;background:none;color:rgba(255,255,255,.85);font-size:14px;font-weight:600;padding:8px 6px;text-decoration:underline;text-underline-offset:3px}
+.crop-more #cDel{color:#FFB3B3}
 .crop-btns{display:flex;gap:8px;width:min(86vw,360px)}.crop-btns .btn{flex:1;min-height:46px;padding:10px}
 .crop-btns .btn.ghost{color:#F7C7D2;border-color:rgba(247,199,210,.5)}
 .pp-btns button{font-size:14px}
@@ -1681,13 +1687,13 @@ const PDB={db:null,
   async del(k){delete memPhotos[k];const db=await this.open();if(!db)return;try{db.transaction('photos','readwrite').objectStore('photos').delete(k);}catch(e){}}
 };
 /* ---------- 사진 위치·크기 조정 ---------- */
-function openCropper(src){
+function openCropper(src,opt){opt=opt||{};
   return new Promise(resolve=>{
     const o=document.createElement('div');o.className='crop-ov';
     o.innerHTML=`<div class="crop-top"><b>사진 위치 맞추기</b><span>두 손가락으로 확대·축소하고, 끌어서 위치를 옮겨요</span></div>
     <div class="crop-stage" id="cStage"><img id="cImg" alt="" draggable="false"><div class="crop-grid"></div></div>
     <div class="crop-zoom"><button type="button" id="cOut" aria-label="축소">−</button><input type="range" id="cRange" min="0" max="100" value="0" aria-label="확대 정도"><button type="button" id="cIn" aria-label="확대">+</button></div>
-    <div class="crop-btns"><button type="button" class="btn ghost" id="cCancel">취소</button><button type="button" class="btn ghost" id="cReset">원래대로</button><button type="button" class="btn" id="cOk">사용하기</button></div>`;
+    <div class="crop-btns"><button type="button" class="btn ghost" id="cCancel">취소</button><button type="button" class="btn ghost" id="cReset">원래대로</button><button type="button" class="btn" id="cOk">사용하기</button></div>${opt.edit?`<div class="crop-more"><button type="button" id="cChange">다른 사진으로 바꾸기</button><span>·</span><button type="button" id="cDel">사진 지우기</button></div>`:''}`;
     document.body.appendChild(o);
     const st=o.querySelector('#cStage'),im=o.querySelector('#cImg'),rg=o.querySelector('#cRange');
     let W=0,H=0,iw=0,ih=0,minS=1,maxS=4,s=1,tx=0,ty=0;
@@ -1716,6 +1722,8 @@ function openCropper(src){
     o.querySelector('#cReset').onclick=fit;
     function close(v){o.remove();resolve(v);}
     o.querySelector('#cCancel').onclick=()=>close(null);
+    if(opt.edit){o.querySelector('#cChange').onclick=()=>{close(null);opt.onChange&&opt.onChange();};
+      const dl=o.querySelector('#cDel');let armed=false;dl.onclick=()=>{if(!armed){armed=true;dl.textContent='한 번 더 누르면 지워요';setTimeout(()=>{armed=false;dl.textContent='사진 지우기';},2500);return;}close(null);opt.onDelete&&opt.onDelete();};}
     o.querySelector('#cOk').onclick=()=>{
       try{const OW=600,OH=800,c=document.createElement('canvas');c.width=OW;c.height=OH;const g=c.getContext('2d');
         g.fillStyle='#fff';g.fillRect(0,0,OW,OH);g.drawImage(im,-tx/s,-ty/s,W/s,H/s,0,0,OW,OH);close(c.toDataURL('image/jpeg',.8));}
@@ -1862,10 +1870,10 @@ function openRecord(id,styleId,presetName){
     let cur=d.cur||settings.currency;let newPhoto=null,removePhoto=false;
     const pp=s.querySelector('#pp'),fp=s.querySelector('#fPhoto');
     let curSrc=null;
-    const drawPick=src=>{curSrc=src;pp.innerHTML=src?`<img src="${src}" alt="와인 사진"><div class="pp-btns"><button type="button" id="ppEdit">조정</button><button type="button" id="ppChange">바꾸기</button><button type="button" id="ppDel">지우기</button></div>`:`<button type="button" class="pp-empty" id="ppAdd"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg><span>사진 넣기</span><small>찍기 · 앨범</small></button>`;
+    const drawPick=src=>{curSrc=src;pp.innerHTML=src?`<button type="button" class="pp-img" id="ppEdit" aria-label="사진 조정·바꾸기·지우기"><img src="${src}" alt="와인 사진"><span class="pp-pen"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg></span></button>`:`<button type="button" class="pp-empty" id="ppAdd"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg><span>사진 넣기</span><small>찍기 · 앨범</small></button>`;
       const a=pp.querySelector('#ppAdd'),c=pp.querySelector('#ppChange'),x=pp.querySelector('#ppDel');
       if(a)a.onclick=()=>fp.click();if(c)c.onclick=()=>fp.click();
-      const ed=pp.querySelector('#ppEdit');if(ed)ed.onclick=async()=>{const out=await openCropper(curSrc);if(out){newPhoto=out;removePhoto=false;drawPick(out);}};
+      const ed=pp.querySelector('#ppEdit');if(ed)ed.onclick=async()=>{const out=await openCropper(curSrc,{edit:true,onChange:()=>fp.click(),onDelete:()=>{newPhoto=null;removePhoto=true;drawPick(null);toast('사진을 지웠어요');}});if(out){newPhoto=out;removePhoto=false;drawPick(out);}};
       if(x)x.onclick=()=>{newPhoto=null;removePhoto=true;drawPick(null);};};
     drawPick(null);
     if(d.photo)PDB.get(d.photo).then(src=>{if(src&&!newPhoto&&!removePhoto)drawPick(src);});
@@ -2076,7 +2084,7 @@ $('#searchBtn').onclick=openSearch;
 S.level=store.get('level','basic')||'basic';
 function fromHash(){const h=(location.hash||'').slice(1);if(['home','learn','pick','log'].includes(h)){S.tab=h;}}
 /* ---------- CocktailPick 연결 ---------- */
-const APP_VERSION='1.1.4',APP_DATE='2026.11.22';
+const APP_VERSION='1.1.5',APP_DATE='2026.11.22';
 const SHARE_URL='https://bit.ly/winepick'; // 친구에게 보내는 주소 (Bitly)
 const QR_SVG="<svg viewBox=\"-2 -2 33 33\" width=\"100%\" height=\"100%\" shape-rendering=\"crispEdges\" aria-label=\"WinePick QR \ucf54\ub4dc\"><rect x=\"-2\" y=\"-2\" width=\"33\" height=\"33\" fill=\"#fff\"/><path d=\"M2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM5 2h1v1h-1zM6 2h1v1h-1zM7 2h1v1h-1zM8 2h1v1h-1zM13 2h1v1h-1zM14 2h1v1h-1zM15 2h1v1h-1zM18 2h1v1h-1zM20 2h1v1h-1zM21 2h1v1h-1zM22 2h1v1h-1zM23 2h1v1h-1zM24 2h1v1h-1zM25 2h1v1h-1zM26 2h1v1h-1zM2 3h1v1h-1zM8 3h1v1h-1zM11 3h1v1h-1zM15 3h1v1h-1zM16 3h1v1h-1zM17 3h1v1h-1zM18 3h1v1h-1zM20 3h1v1h-1zM26 3h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM10 4h1v1h-1zM13 4h1v1h-1zM17 4h1v1h-1zM20 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM26 4h1v1h-1zM2 5h1v1h-1zM4 5h1v1h-1zM5 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM10 5h1v1h-1zM11 5h1v1h-1zM12 5h1v1h-1zM15 5h1v1h-1zM16 5h1v1h-1zM20 5h1v1h-1zM22 5h1v1h-1zM23 5h1v1h-1zM24 5h1v1h-1zM26 5h1v1h-1zM2 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM11 6h1v1h-1zM13 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM23 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM11 7h1v1h-1zM14 7h1v1h-1zM16 7h1v1h-1zM17 7h1v1h-1zM18 7h1v1h-1zM20 7h1v1h-1zM26 7h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1zM4 8h1v1h-1zM5 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM21 8h1v1h-1zM22 8h1v1h-1zM23 8h1v1h-1zM24 8h1v1h-1zM25 8h1v1h-1zM26 8h1v1h-1zM10 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM16 9h1v1h-1zM18 9h1v1h-1zM2 10h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM14 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM21 10h1v1h-1zM22 10h1v1h-1zM23 10h1v1h-1zM24 10h1v1h-1zM9 11h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM13 11h1v1h-1zM16 11h1v1h-1zM18 11h1v1h-1zM21 11h1v1h-1zM25 11h1v1h-1zM2 12h1v1h-1zM6 12h1v1h-1zM8 12h1v1h-1zM9 12h1v1h-1zM10 12h1v1h-1zM12 12h1v1h-1zM13 12h1v1h-1zM14 12h1v1h-1zM17 12h1v1h-1zM18 12h1v1h-1zM22 12h1v1h-1zM23 12h1v1h-1zM25 12h1v1h-1zM26 12h1v1h-1zM3 13h1v1h-1zM4 13h1v1h-1zM7 13h1v1h-1zM9 13h1v1h-1zM18 13h1v1h-1zM19 13h1v1h-1zM20 13h1v1h-1zM26 13h1v1h-1zM2 14h1v1h-1zM6 14h1v1h-1zM8 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM19 14h1v1h-1zM20 14h1v1h-1zM22 14h1v1h-1zM24 14h1v1h-1zM25 14h1v1h-1zM26 14h1v1h-1zM2 15h1v1h-1zM3 15h1v1h-1zM4 15h1v1h-1zM5 15h1v1h-1zM6 15h1v1h-1zM9 15h1v1h-1zM10 15h1v1h-1zM15 15h1v1h-1zM19 15h1v1h-1zM21 15h1v1h-1zM23 15h1v1h-1zM25 15h1v1h-1zM2 16h1v1h-1zM4 16h1v1h-1zM6 16h1v1h-1zM8 16h1v1h-1zM11 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM17 16h1v1h-1zM18 16h1v1h-1zM19 16h1v1h-1zM20 16h1v1h-1zM21 16h1v1h-1zM22 16h1v1h-1zM23 16h1v1h-1zM25 16h1v1h-1zM26 16h1v1h-1zM2 17h1v1h-1zM4 17h1v1h-1zM5 17h1v1h-1zM7 17h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM20 17h1v1h-1zM21 17h1v1h-1zM22 17h1v1h-1zM26 17h1v1h-1zM2 18h1v1h-1zM3 18h1v1h-1zM4 18h1v1h-1zM5 18h1v1h-1zM7 18h1v1h-1zM8 18h1v1h-1zM10 18h1v1h-1zM11 18h1v1h-1zM13 18h1v1h-1zM15 18h1v1h-1zM16 18h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1zM20 18h1v1h-1zM21 18h1v1h-1zM22 18h1v1h-1zM24 18h1v1h-1zM10 19h1v1h-1zM11 19h1v1h-1zM12 19h1v1h-1zM14 19h1v1h-1zM18 19h1v1h-1zM22 19h1v1h-1zM23 19h1v1h-1zM2 20h1v1h-1zM3 20h1v1h-1zM4 20h1v1h-1zM5 20h1v1h-1zM6 20h1v1h-1zM7 20h1v1h-1zM8 20h1v1h-1zM15 20h1v1h-1zM18 20h1v1h-1zM20 20h1v1h-1zM22 20h1v1h-1zM24 20h1v1h-1zM25 20h1v1h-1zM26 20h1v1h-1zM2 21h1v1h-1zM8 21h1v1h-1zM10 21h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM14 21h1v1h-1zM16 21h1v1h-1zM18 21h1v1h-1zM22 21h1v1h-1zM23 21h1v1h-1zM25 21h1v1h-1zM2 22h1v1h-1zM4 22h1v1h-1zM5 22h1v1h-1zM6 22h1v1h-1zM8 22h1v1h-1zM10 22h1v1h-1zM12 22h1v1h-1zM14 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM17 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM21 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM25 22h1v1h-1zM26 22h1v1h-1zM2 23h1v1h-1zM4 23h1v1h-1zM5 23h1v1h-1zM6 23h1v1h-1zM8 23h1v1h-1zM10 23h1v1h-1zM11 23h1v1h-1zM12 23h1v1h-1zM15 23h1v1h-1zM17 23h1v1h-1zM20 23h1v1h-1zM22 23h1v1h-1zM23 23h1v1h-1zM24 23h1v1h-1zM25 23h1v1h-1zM26 23h1v1h-1zM2 24h1v1h-1zM4 24h1v1h-1zM5 24h1v1h-1zM6 24h1v1h-1zM8 24h1v1h-1zM10 24h1v1h-1zM13 24h1v1h-1zM14 24h1v1h-1zM15 24h1v1h-1zM18 24h1v1h-1zM23 24h1v1h-1zM24 24h1v1h-1zM26 24h1v1h-1zM2 25h1v1h-1zM8 25h1v1h-1zM12 25h1v1h-1zM13 25h1v1h-1zM16 25h1v1h-1zM17 25h1v1h-1zM18 25h1v1h-1zM19 25h1v1h-1zM21 25h1v1h-1zM22 25h1v1h-1zM23 25h1v1h-1zM26 25h1v1h-1zM2 26h1v1h-1zM3 26h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM7 26h1v1h-1zM8 26h1v1h-1zM10 26h1v1h-1zM12 26h1v1h-1zM13 26h1v1h-1zM14 26h1v1h-1zM21 26h1v1h-1zM22 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM25 26h1v1h-1zM26 26h1v1h-1z\" fill=\"#22070E\"/></svg>";
 const COCKTAILPICK_URL='https://bit.ly/cocktailpick';
